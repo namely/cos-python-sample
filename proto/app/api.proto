@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package com.namely.protobuf.chief_of_state.samples;
+
+message Request {
+  string id = 1;
+  string append_me = 2;
+}
+
+message Response {
+  State state = 1;
+}
+
+message State {
+  string id = 1;
+  repeated string values = 2;
+}
+
+service TestService {
+  // One request followed by one response.
+  rpc UnaryCall(Request) returns (Response);
+}
