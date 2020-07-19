@@ -6,13 +6,13 @@ from chief_of_state_impl.cos_helpers import CosHelpers
 class CommandHandler():
     @staticmethod
     def handle_command(command, current_state, meta):
-        print(type(command))
-        print(command)
-        return CosHelpers.reply()
+
         if (command.command.type.contains("AppendRequest")):
             return _handle_command_append(command, current_state, meta)
+
         elif (command.command.type.contains("GetRequest")):
             return _handle_command_get
+
         else:
             # TODO: throw error
             return CosHelpers.reply()
