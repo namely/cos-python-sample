@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package com.namely.protobuf.chief_of_state.samples;
+
+message AppendEvent {
+    string id = 1;
+    string appended = 2;
+  }

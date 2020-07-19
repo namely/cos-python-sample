@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package com.namely.protobuf.chief_of_state.samples;
 
+import "sample_app/state.proto";
+
 message AppendRequest {
   string id = 1;
   string append = 2;
@@ -11,17 +13,7 @@ message GetRequest {
   string id = 1;
 }
 
-message Event {
-  string id = 1;
-  string appended = 2;
-}
-
-message State {
-  string id = 1;
-  repeated string values = 2;
-}
-
-service TestService {
+service SampleService {
   // One request followed by one response.
   rpc AppendCall(AppendRequest) returns (State);
   rpc GetCall(GetRequest) returns (State);
