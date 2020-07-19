@@ -1,41 +1,55 @@
+DCO := docker-compose --project-directory . -f ./docker/docker-compose.yml
 
+.phony: setup
+setup:
+	git submodule update --init
+
+.phony: protogen
+protogen:
+	@docker run \
+		-v `pwd`:/mnt/local/ \
+		-w /mnt/local/ \
+		python:3.7.6-stretch \
+		./scripts/proto-generate.sh
 
 .phony: shell
 shell:
-	docker run -it \
+	@docker run -it \
 		-v `pwd`:/mnt/local/ \
 		-w /mnt/local/ \
-		-p 50051:50051 \
 		python:3.7.6-stretch \
 		bash
 
-.phony: pip-install
-pip-install:
-	pip install -r requirements.txt
 
+.phony: test-shell
+test-shell:
+	@docker run -it \
+		-v `pwd`:/mnt/local/ \
+		-w /mnt/local/server \
+		-p 9090:9090 \
+		cos-python-sample:latest \
+		bash
 
-.phony: proto-gen
-proto-gen:
+.phony: dco
+dco:
+	@echo $(DCO)
 
-	rm -rf ./app/*pb2*.py
+.phony: ps
+ps:
+	@ $(DCO) ps
 
-	python -m grpc_tools.protoc \
-		-I./proto/ \
-		--python_out=. \
-		--grpc_python_out=. \
-		./proto/app/*.proto
+.phony: logs
+logs:
+	@ $(DCO) logs -f --tail="all"
 
-	rm -rf ./handler/*pb2*.py
+.phony: build
+build:
+	@ $(DCO) build
 
-	python -m grpc_tools.protoc \
-		-I./submodules/chief-of-state/protos/ \
-		--python_out=./handler/ \
-		--grpc_python_out=./handler/ \
-		./submodules/chief-of-state/protos/chief_of_state/*write*_handler.proto
+.phony: up
+up:
+	@ $(DCO) up -d
 
-
-
-
-.phony: run-api
-run-api:
-	@python -m app
+.phony: down
+down:
+	@ $(DCO) down -t 0 --remove-orphans

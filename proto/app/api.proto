@@ -2,13 +2,18 @@ syntax = "proto3";
 
 package com.namely.protobuf.chief_of_state.samples;
 
-message Request {
+message AppendRequest {
   string id = 1;
-  string append_me = 2;
+  string append = 2;
 }
 
-message Response {
-  State state = 1;
+message GetRequest {
+  string id = 1;
+}
+
+message Event {
+  string id = 1;
+  string appended = 2;
 }
 
 message State {
@@ -18,5 +23,6 @@ message State {
 
 service TestService {
   // One request followed by one response.
-  rpc UnaryCall(Request) returns (Response);
+  rpc AppendCall(AppendRequest) returns (State);
+  rpc GetCall(GetRequest) returns (State);
 }

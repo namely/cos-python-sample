@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    image: cos-python-sample
+    volumes:
+      - ./server:/app/server
+    entrypoint:
+      - python
+      - run_app.py
+    ports:
+      - 9090:9090
+
+  write-handler:
+    image: cos-python-sample
+    volumes:
+      - ./server:/app/server
+    entrypoint:
+      - python
+      - run_handler.py
+    ports:
+      - 9091:9091
