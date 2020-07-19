@@ -1,6 +1,7 @@
 from chief_of_state.writeside_pb2 import (PersistAndReply, Reply, HandleEventResponse)
 from chief_of_state.writeside_pb2 import HandleCommandResponse
 
+
 class CosHelpers():
     @staticmethod
     def persist_and_reply(event):
