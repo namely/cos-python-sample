@@ -1,7 +1,6 @@
 from concurrent import futures
 import logging
 import grpc
-import app.api_pb2_grpc
 from google.protobuf.any_pb2 import Any
 from chief_of_state.writeside_pb2_grpc import WriteSideHandlerServiceServicer
 from chief_of_state.writeside_pb2_grpc import add_WriteSideHandlerServiceServicer_to_server

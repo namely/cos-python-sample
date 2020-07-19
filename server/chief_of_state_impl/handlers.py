@@ -1,4 +1,6 @@
-from app.api_pb2 import AppendRequest, GetRequest, State, Event
+from sample_app.api_pb2 import AppendRequest, GetRequest
+from sample_app.events_pb2 import AppendEvent
+from sample_app.state_pb2 import State
 from google.protobuf.any_pb2 import Any
 from chief_of_state.writeside_pb2 import (PersistAndReply, PersistAndReply, Reply)
 from chief_of_state_impl.cos_helpers import CosHelpers
@@ -24,6 +26,7 @@ class CommandHandler():
 
     @staticmethod
     def _handle_command_append(command, current_state, meta):
+        '''validate AppendRequest and produce an Event'''
         # unpack inner command/event
         real_command = command.Unpack(AppendRequest)
         real_current_state = current_state.Unpack(State)
@@ -33,7 +36,7 @@ class CommandHandler():
         assert not real_command.append in real_current_state.values, f"duplicate value {real_command.append}"
 
         # make event
-        event = Event()
+        event = AppendEvent()
         event.id = real_command.id
         event.appended = real_command.append
 

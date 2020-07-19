@@ -1,12 +1,14 @@
 from concurrent import futures
 import logging
 import grpc
-import app.api_pb2_grpc
-from app.api_pb2 import (AppendRequest, GetRequest, State)
-from app_impl.validation import StatelessValidation
+from sample_app.api_pb2 import (AppendRequest, GetRequest)
+from sample_app.state_pb2 import State
+from sample_app.api_pb2_grpc import SampleServiceServicer
+from sample_app.api_pb2_grpc import add_SampleServiceServicer_to_server
+from .validation import StatelessValidation
 
 
-class TestServiceImpl(app.api_pb2_grpc.TestServiceServicer):
+class SampleServiceImpl(SampleServiceServicer):
     def AppendCall(self, request, context):
 
         # do stateless validation
@@ -35,9 +37,14 @@ class TestServiceImpl(app.api_pb2_grpc.TestServiceServicer):
 def run(port):
     logging.basicConfig()
     logging.info("starting server")
+
+    # define grpc server
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    app.api_pb2_grpc.add_TestServiceServicer_to_server(TestServiceImpl(), server)
+    # add grpc implementation to server
+    add_SampleServiceServicer_to_server(SampleServiceImpl(), server)
+    # set port
     server.add_insecure_port(f'[::]:{port}')
+    # start
     server.start()
     server.wait_for_termination()
     logging.info("killing server")

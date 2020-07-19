@@ -1,4 +1,4 @@
-from app_impl.service import run
+from sample_app_impl.service import run
 
 PORT = 9090
 
