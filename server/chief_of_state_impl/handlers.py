@@ -7,15 +7,19 @@ from chief_of_state_impl.cos_helpers import CosHelpers
 class CommandHandler():
     @staticmethod
     def handle_command(command, current_state, meta):
+        '''
+        general handler that matches on command type url and runs
+        appropriate handler method
+        '''
 
         if (command.command.type.contains("AppendRequest")):
             return _handle_command_append(command, current_state, meta)
 
         elif (command.command.type.contains("GetRequest")):
-            return _handle_command_get
+            return CosHelpers.reply()
 
         else:
-            # TODO: throw error
+            # TODO: throw error for unknown type url
             return CosHelpers.reply()
 
     @staticmethod
@@ -38,9 +42,16 @@ class CommandHandler():
 
 class EventHandler():
     @staticmethod
-    def _handle_command_get(command, current_state, meta):
-        return CosHelpers.reply()
-
-    @staticmethod
     def handle_event(event, current_state, meta):
-        pass
+        # build new state
+        new_state = State.CopyFrom(current_state)
+        new_state.values.append(event.appended)
+
+        # create return
+        any_new_state = Any()
+        any_new_state.Pack(new_state)
+
+        response = HandleEventResponse()
+        response.resulting_state = any_new_state
+
+        return response

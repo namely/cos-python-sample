@@ -11,8 +11,8 @@ from .handlers import CommandHandler, EventHandler
 
 
 class WriteSideHandlerImpl(WriteSideHandlerServiceServicer):
-    def HandleCommand(self, request, context):
 
+    def HandleCommand(self, request, context):
         # do stateful validation
         StatefulValidation.validate(request)
 
