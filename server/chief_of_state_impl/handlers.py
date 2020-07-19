@@ -3,6 +3,7 @@ from google.protobuf.any_pb2 import Any
 from chief_of_state.writeside_pb2 import (PersistAndReply, PersistAndReply, Reply)
 from chief_of_state_impl.cos_helpers import CosHelpers
 
+
 class CommandHandler():
     @staticmethod
     def handle_command(command, current_state, meta):
@@ -34,6 +35,8 @@ class CommandHandler():
 
         return CosHelpers.persist_and_reply(event)
 
+
+class EventHandler():
     @staticmethod
     def _handle_command_get(command, current_state, meta):
         return CosHelpers.reply()

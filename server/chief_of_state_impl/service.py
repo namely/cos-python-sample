@@ -7,7 +7,7 @@ from chief_of_state.writeside_pb2_grpc import WriteSideHandlerServiceServicer
 from chief_of_state.writeside_pb2_grpc import add_WriteSideHandlerServiceServicer_to_server
 from chief_of_state.writeside_pb2 import (PersistAndReply, PersistAndReply, Reply)
 from .validation import StatefulValidation
-from .handlers import CommandHandler
+from .handlers import CommandHandler, EventHandler
 
 
 class WriteSideHandlerImpl(WriteSideHandlerServiceServicer):
@@ -29,7 +29,7 @@ class WriteSideHandlerImpl(WriteSideHandlerServiceServicer):
     def HandleEvent(self, request, context):
         # given event and prior state, build a new state
         # this should never fail!
-        new_state = Handlers.handle_event(
+        new_state = EventHandler.handle_event(
             event = request.event,
             current_state = request.current_state,
             meta = request.meta
