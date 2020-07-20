@@ -41,18 +41,13 @@ class WriteSideHandlerImpl(WriteSideHandlerServiceServicer):
 
         # given event and prior state, build a new state
         # this should never fail!
-        new_state = EventHandler.handle_event(
+        response = EventHandler.handle_event(
             event = request.event,
             current_state = request.current_state,
             meta = request.meta
         )
 
-        # create return
-        any_new_state = Any()
-        any_new_state.Pack(new_state)
-
-        response = HandleEventResponse()
-        response.resulting_state = any_new_state
+        logger.debug(MessageToJson(response))
 
         return response
 

@@ -2,7 +2,7 @@ from sample_app.api_pb2 import AppendRequest, GetRequest, CreateRequest
 from sample_app.events_pb2 import AppendEvent, CreateEvent
 from sample_app.state_pb2 import State
 from google.protobuf.any_pb2 import Any
-from chief_of_state.writeside_pb2 import PersistAndReply, PersistAndReply, Reply
+from chief_of_state.writeside_pb2 import PersistAndReply, PersistAndReply, Reply, HandleEventResponse
 from write_handler_impl.cos_helpers import CosHelpers
 from google.protobuf.json_format import MessageToJson
 import logging
@@ -49,7 +49,7 @@ class CommandHandler():
         real_current_state = State()
         current_state.Unpack(real_current_state)
 
-        assert not real_current_state.id, f'id already exists {real_current_state.id}'
+        # assert not real_current_state.id, f'id already exists {real_current_state.id}'
 
         event = CreateEvent(id=real_command.id)
         output = CosHelpers.persist_and_reply(event)
@@ -85,16 +85,45 @@ class CommandHandler():
 class EventHandler():
     @staticmethod
     def handle_event(event, current_state, meta):
+        if ('AppendEvent' in event.type_url):
+            return EventHandler._handle_append(event, current_state, meta)
+
+        elif ('CreateEvent' in event.type_url):
+            return EventHandler._handle_create(event, current_state, meta)
+
+        else:
+            raise Exception(f'unhandled event {event.type_url}')
+
+    def _handle_append(event, current_state, meta):
+        real_current_state = State()
+        current_state.Unpack(real_current_state)
+
+        real_event = AppendEvent()
+        event.Unpack(real_event)
+
         # build new state
         new_state = State()
-        new_state.CopyFrom(current_state)
-        new_state.values.append(event.appended)
+        new_state.CopyFrom(real_current_state)
+        new_state.values.append(real_event.appended)
 
         # create return
         any_new_state = Any()
         any_new_state.Pack(new_state)
 
         response = HandleEventResponse()
-        response.resulting_state = any_new_state
+        response.resulting_state.CopyFrom(any_new_state)
+
+        return response
+
+    def _handle_create(event, current_state, meta):
+        real_event = CreateEvent()
+        event.Unpack(real_event)
+
+        new_state = State(id = real_event.id)
+        any_new_state = Any()
+        any_new_state.Pack(new_state)
+
+        response = HandleEventResponse()
+        response.resulting_state.CopyFrom(any_new_state)
 
         return response
