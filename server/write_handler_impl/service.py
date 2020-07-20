@@ -1,6 +1,7 @@
 from concurrent import futures
 import logging
 import grpc
+import sys
 from google.protobuf.any_pb2 import Any
 from chief_of_state.writeside_pb2_grpc import WriteSideHandlerServiceServicer
 from chief_of_state.writeside_pb2_grpc import add_WriteSideHandlerServiceServicer_to_server
@@ -11,6 +12,8 @@ from google.protobuf.json_format import MessageToJson
 
 
 class WriteSideHandlerImpl(WriteSideHandlerServiceServicer):
+
+    logger = logging.getLogger(__name__)
 
     def HandleCommand(self, request, context):
         assert isinstance(request, HandleCommandRequest)
@@ -49,8 +52,19 @@ class WriteSideHandlerImpl(WriteSideHandlerServiceServicer):
         return response
 
 
+def configure_logging():
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    root.addHandler(handler)
+
+
 def run(port):
-    logging.basicConfig()
+    configure_logging()
     logging.info("starting server")
     print("starting server...")
 

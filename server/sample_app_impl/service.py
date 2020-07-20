@@ -2,40 +2,53 @@ from concurrent import futures
 import logging
 import grpc
 import os
-from sample_app.api_pb2 import (AppendRequest, GetRequest)
+import sys
+from sample_app.api_pb2 import (CreateRequest, AppendRequest, GetRequest)
 from sample_app.state_pb2 import State
 from sample_app.api_pb2_grpc import SampleServiceServicer
 from sample_app.api_pb2_grpc import add_SampleServiceServicer_to_server
 from chief_of_state.service_pb2_grpc import ChiefOfStateServiceStub
 from .validation import StatelessValidation
 from .cos_client import CosClient
+from google.protobuf.json_format import MessageToJson
 
 
 class SampleServiceImpl(SampleServiceServicer):
-    def AppendCall(self, request, context):
+    logger = logging.getLogger(__name__)
 
+    def CreateCall(self, request, context):
+        self.logger.debug("begin CreateCall")
+        self.logger.debug(MessageToJson(request))
         # do stateless validation
         StatelessValidation.validate(request)
-
         # send to chief of state, get resulting state
-        state = CosClient.process_command(request.id, request)
+        result = CosClient.process_command(request.id, request)
+        return result
 
-        # convert back to gRPC expected response
-        return state
+    def AppendCall(self, request, context):
+        # do stateless validation
+        StatelessValidation.validate(request)
+        # send to chief of state, get resulting state
+        return CosClient.process_command(request.id, request)
 
     def GetCall(self, request, context):
         # send to chief of state, get resulting state
-        state = State(
-            id=request.id,
-            values=["a"]
-        )
+        return CosClient.process_command(request.id, request)
 
-        # convert back to gRPC expected response
-        return state
+
+def configure_logging():
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    root.addHandler(handler)
 
 
 def run(port):
-    logging.basicConfig()
+    configure_logging()
     logging.info("starting server")
 
     # define grpc server

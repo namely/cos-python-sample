@@ -1,6 +1,6 @@
 import grpc
-from sample_app.api_pb2 import AppendRequest, GetRequest
-from sample_app.events_pb2 import AppendEvent
+from sample_app.api_pb2 import AppendRequest, GetRequest, CreateRequest
+from sample_app.events_pb2 import AppendEvent, CreateEvent
 from sample_app.state_pb2 import State
 from google.protobuf.json_format import MessageToJson
 from chief_of_state.writeside_pb2_grpc import WriteSideHandlerServiceStub
@@ -18,16 +18,36 @@ from test.helpers import get_channel, pack_any, unpack_any
 
 class TestHandler():
     @staticmethod
-    def run():
-        host = "write-handler"
-        port = "9091"
-
+    def run(host, port):
         channel = get_channel(host, port)
         stub = WriteSideHandlerServiceStub(channel)
 
+        TestHandler.handleCommandCreate(stub)
         TestHandler.handleCommandAppend(stub)
         TestHandler.handleCommandGet(stub)
 
+    @staticmethod
+    def handleCommandCreate(stub):
+        print("TestHandler.handleCommandCreate")
+        id = "test-command"
+        cmd = CreateRequest(id = id)
+        current_state = State()
+        meta = MetaData()
+
+        request = HandleCommandRequest(
+            command=pack_any(cmd),
+            current_state=pack_any(current_state),
+            meta=meta,
+        )
+
+        response = stub.HandleCommand(request)
+
+        assert isinstance(response, HandleCommandResponse)
+
+        response_event = CreateEvent()
+        response.persist_and_reply.event.Unpack(response_event)
+
+        assert response_event.id == id
 
     @staticmethod
     def handleCommandAppend(stub):

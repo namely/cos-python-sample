@@ -15,11 +15,8 @@ protogen:
 
 .phony: test-client
 test-client:
-	@ $(DCO) run --rm \
-		--entrypoint bash \
-		-v `pwd`/client:/app/client \
-		-w /app/client \
-		api
+	@ $(DCO) up -d test-client
+	@ $(DCO) exec test-client bash
 
 .phony: dco
 dco:

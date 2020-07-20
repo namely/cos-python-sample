@@ -10,12 +10,8 @@ from google.protobuf.any_pb2 import Any
 
 class TestCos():
     @staticmethod
-    def run():
-        host = "cos"
-        # host = "host.docker.internal"
-        port = "9000"
-
-        channel = grpc.insecure_channel(f'{host}:{port}')
+    def run(host, port):
+        channel = get_channel(host, port)
         stub = ChiefOfStateServiceStub(channel)
 
         print("TestCos.ProcessCommand")
@@ -31,6 +27,8 @@ class TestCos():
             entity_uuid = id,
             command = pack_any(command)
         )
+
+        print(MessageToJson(cos_request))
 
         # send to COS
         response = stub.ProcessCommand(cos_request)

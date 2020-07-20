@@ -1,5 +1,4 @@
 import grpc
-
 from google.protobuf.any_pb2 import Any
 
 def get_channel(host, port):

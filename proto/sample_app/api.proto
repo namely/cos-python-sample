@@ -4,6 +4,10 @@ package com.namely.protobuf.chief_of_state.samples;
 
 import "sample_app/state.proto";
 
+message CreateRequest {
+  string id = 1;
+}
+
 message AppendRequest {
   string id = 1;
   string append = 2;
@@ -14,7 +18,7 @@ message GetRequest {
 }
 
 service SampleService {
-  // One request followed by one response.
+  rpc CreateCall(CreateRequest) returns (State);
   rpc AppendCall(AppendRequest) returns (State);
   rpc GetCall(GetRequest) returns (State);
 }

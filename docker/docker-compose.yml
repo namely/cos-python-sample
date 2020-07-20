@@ -11,9 +11,9 @@ services:
       - python
       - run_app.py
     ports:
-      - 9090:9090
+      - 9010:9010
     environment:
-      COS_HOST: "cos"
+      COS_HOST: "host.docker.internal"
       COS_PORT: "9000"
 
   write-handler:
@@ -24,7 +24,58 @@ services:
       - python
       - run_write_handler.py
     ports:
-      - 9091:9091
+      - 9011:9011
+
+  test-client:
+    image: cos-python-sample:latest
+    container_name: test-client
+    working_dir: /app/client
+    volumes:
+      - ./client:/app/client
+    entrypoint:
+      - sleep
+      - infinity
+
+  cos:
+    image: registry.namely.land/namely/chief-of-state:0.1.0
+    # image: cos-test:latest
+    depends_on:
+      - postgres
+    ports:
+      - 9000:9000
+      - 9102:9102
+      - 9095:9095
+      - 5266:5266
+    environment:
+      COS_ADDRESS: "0.0.0.0"
+      COS_PORT: 9000
+      WRITE_SIDE_HANDLER_SERVICE_HOST: write-handler
+      WRITE_SIDE_HANDLER_SERVICE_PORT: 9011
+      HANDLER_SERVICE_STATE_PROTO: "sample_app.State"
+      HANDLER_SERVICE_EVENTS_PROTOS: "sample_app.AppendEvent"
+      TRACE_HOST: tracer
+      TRACE_PORT: 14268
+      COS_SERVICE_NAME: "chiefofstate"
+      NAMELY_ENV: "dev"
+      TEAM_NAME: "data"
+      COS_POSTGRES_USER: "postgres"
+      COS_POSTGRES_PASSWORD: "changeme"
+      COS_POSTGRES_HOST: "postgres"
+      COS_POSTGRES_PORT: 5432
+      COS_POSTGRES_DB: "postgres"
+      COS_POSTGRES_SCHEMA: "public"
+      COS_EVENTS_BATCH_THRESHOLD: 2
+      COS_NUM_SNAPSHOTS_TO_RETAIN: 2
+      COS_READ_SIDE_ENABLED: "false"
+      COS_READ_SIDE_OFFSET_DB_HOST: "postgres"
+      COS_READ_SIDE_OFFSET_DB_PORT: 5432
+      COS_READ_SIDE_OFFSET_DB_USER: "postgres"
+      COS_READ_SIDE_OFFSET_DB_PASSWORD: "changeme"
+      COS_READ_SIDE_OFFSET_DB: "postgres"
+      COS_READ_SIDE_OFFSET_DB_SCHEMA: "public"
+      READ_SIDE_HANDLER_SERVICE_HOST: host.docker.internal
+      READ_SIDE_HANDLER_SERVICE_PORT: 50053
+      JAVA_OPTS: "-Dconfig.resource=docker.conf"
 
   postgres:
     image: postgres
@@ -57,43 +108,18 @@ services:
       - 16686:16686
       - 14268:14268
 
-  cos:
-    image: registry.namely.land/namely/chief-of-state:0.1.0
-    # image: cos-test:latest
-    depends_on:
-      - postgres
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - ./docker/grafana-prometheus.yml:/etc/grafana/provisioning/datasources/prometheus.yml
     ports:
-      - 9000:9000
-      - 9102:9102
-      - 9095:9095
-      - 5266:5266
-    environment:
-      COS_ADDRESS: "0.0.0.0"
-      COS_PORT: 9000
-      WRITE_SIDE_HANDLER_SERVICE_HOST: host.docker.internal
-      WRITE_SIDE_HANDLER_SERVICE_PORT: 9091
-      HANDLER_SERVICE_STATE_PROTO: "sample_app.State"
-      HANDLER_SERVICE_EVENTS_PROTOS: "sample_app.AppendEvent"
-      TRACE_HOST: tracer
-      TRACE_PORT: 14268
-      COS_SERVICE_NAME: "chiefofstate"
-      NAMELY_ENV: "dev"
-      TEAM_NAME: "data"
-      COS_POSTGRES_USER: "postgres"
-      COS_POSTGRES_PASSWORD: "changeme"
-      COS_POSTGRES_HOST: "postgres"
-      COS_POSTGRES_PORT: 5432
-      COS_POSTGRES_DB: "postgres"
-      COS_POSTGRES_SCHEMA: "public"
-      COS_EVENTS_BATCH_THRESHOLD: 2
-      COS_NUM_SNAPSHOTS_TO_RETAIN: 2
-      COS_READ_SIDE_ENABLED: "false"
-      COS_READ_SIDE_OFFSET_DB_HOST: "postgres"
-      COS_READ_SIDE_OFFSET_DB_PORT: 5432
-      COS_READ_SIDE_OFFSET_DB_USER: "postgres"
-      COS_READ_SIDE_OFFSET_DB_PASSWORD: "changeme"
-      COS_READ_SIDE_OFFSET_DB: "postgres"
-      COS_READ_SIDE_OFFSET_DB_SCHEMA: "public"
-      READ_SIDE_HANDLER_SERVICE_HOST: host.docker.internal
-      READ_SIDE_HANDLER_SERVICE_PORT: 50053
-      JAVA_OPTS: "-Dconfig.resource=docker.conf"
+      - "3000:3000"
+
+  prometheus:
+    image: prom/prometheus:v2.1.0
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - "9090:9090"
