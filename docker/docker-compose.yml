@@ -38,6 +38,13 @@ services:
     entrypoint:
       - sleep
       - infinity
+    environment:
+      API_HOST: api
+      API_PORT: "9010"
+      WRITE_HANDLER_HOST: write-handler
+      WRITE_HANDLER_PORT: "9011"
+      COS_HOST: chiefofstate
+      COS_PORT: "9000"
 
   chiefofstate:
     image: registry.namely.land/namely/chief-of-state:0.1.0
