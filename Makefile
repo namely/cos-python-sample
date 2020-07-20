@@ -2,7 +2,8 @@ DCO := docker-compose --project-directory . -f ./docker/docker-compose.yml
 
 .phony: setup
 setup:
-	git submodule update --init
+	@git submodule update --init
+	@make protogen
 
 .phony: protogen
 protogen:
@@ -12,23 +13,13 @@ protogen:
 		python:3.7.6-stretch \
 		./scripts/proto-generate.sh
 
-.phony: shell
-shell:
-	@docker run -it \
-		-v `pwd`:/mnt/local/ \
-		-w /mnt/local/ \
-		python:3.7.6-stretch \
-		bash
-
-
-.phony: test-shell
-test-shell:
-	@docker run -it \
-		-v `pwd`:/mnt/local/ \
-		-w /mnt/local/server \
-		-p 9090:9090 \
-		cos-python-sample:latest \
-		bash
+.phony: test-client
+test-client:
+	@ $(DCO) run --rm \
+		--entrypoint bash \
+		-v `pwd`/client:/app/client \
+		-w /app/client \
+		api
 
 .phony: dco
 dco:
@@ -40,7 +31,7 @@ ps:
 
 .phony: logs
 logs:
-	@ $(DCO) logs -f --tail="all"
+	@ $(DCO) logs -f --tail="all" api write-handler cos postgres
 
 .phony: build
 build:
@@ -53,3 +44,7 @@ up:
 .phony: down
 down:
 	@ $(DCO) down -t 0 --remove-orphans
+
+.phony: restart
+restart:
+	@ $(DCO) restart -t 0 api write-handler

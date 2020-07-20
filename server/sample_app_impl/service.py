@@ -1,11 +1,14 @@
 from concurrent import futures
 import logging
 import grpc
+import os
 from sample_app.api_pb2 import (AppendRequest, GetRequest)
 from sample_app.state_pb2 import State
 from sample_app.api_pb2_grpc import SampleServiceServicer
 from sample_app.api_pb2_grpc import add_SampleServiceServicer_to_server
+from chief_of_state.service_pb2_grpc import ChiefOfStateServiceStub
 from .validation import StatelessValidation
+from .cos_client import CosClient
 
 
 class SampleServiceImpl(SampleServiceServicer):
@@ -15,10 +18,7 @@ class SampleServiceImpl(SampleServiceServicer):
         StatelessValidation.validate(request)
 
         # send to chief of state, get resulting state
-        state = State(
-            id=request.id,
-            values=[request.append]
-        )
+        state = CosClient.process_command(request.id, request)
 
         # convert back to gRPC expected response
         return state
@@ -27,7 +27,7 @@ class SampleServiceImpl(SampleServiceServicer):
         # send to chief of state, get resulting state
         state = State(
             id=request.id,
-            values=[]
+            values=["a"]
         )
 
         # convert back to gRPC expected response

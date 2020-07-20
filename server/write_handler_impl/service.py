@@ -4,14 +4,17 @@ import grpc
 from google.protobuf.any_pb2 import Any
 from chief_of_state.writeside_pb2_grpc import WriteSideHandlerServiceServicer
 from chief_of_state.writeside_pb2_grpc import add_WriteSideHandlerServiceServicer_to_server
-from chief_of_state.writeside_pb2 import (PersistAndReply, PersistAndReply, Reply)
+from chief_of_state.writeside_pb2 import (PersistAndReply, PersistAndReply, Reply, HandleCommandRequest, HandleEventRequest)
 from .validation import StatefulValidation
 from .handlers import CommandHandler, EventHandler
+from google.protobuf.json_format import MessageToJson
 
 
 class WriteSideHandlerImpl(WriteSideHandlerServiceServicer):
 
     def HandleCommand(self, request, context):
+        assert isinstance(request, HandleCommandRequest)
+
         # do stateful validation
         StatefulValidation.validate(request)
 
@@ -26,6 +29,8 @@ class WriteSideHandlerImpl(WriteSideHandlerServiceServicer):
 
 
     def HandleEvent(self, request, context):
+        assert isinstance(request, HandleEventRequest)
+
         # given event and prior state, build a new state
         # this should never fail!
         new_state = EventHandler.handle_event(

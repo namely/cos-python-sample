@@ -1,5 +1,6 @@
-from chief_of_state.writeside_pb2 import (PersistAndReply, Reply, HandleEventResponse)
-from chief_of_state.writeside_pb2 import HandleCommandResponse
+from chief_of_state.writeside_pb2 import PersistAndReply, Reply, HandleEventResponse
+from chief_of_state.writeside_pb2 import HandleCommandResponse, HandleEventResponse
+from google.protobuf.any_pb2 import Any
 
 
 class CosHelpers():
@@ -10,11 +11,9 @@ class CosHelpers():
         any_event.Pack(event)
 
         persist_and_reply = PersistAndReply()
-        persist_and_reply.event = any_event
+        persist_and_reply.event.CopyFrom(any_event)
 
-        response = HandleCommandResponse(
-            persist_and_reply = persist_and_reply
-        )
+        response = HandleCommandResponse(persist_and_reply=persist_and_reply)
 
         return response
 

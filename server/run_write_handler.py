@@ -1,4 +1,4 @@
-from chief_of_state_impl.service import run
+from write_handler_impl.service import run
 
 PORT = 9091
 
