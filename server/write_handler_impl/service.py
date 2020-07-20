@@ -11,15 +11,18 @@ from .handlers import CommandHandler, EventHandler
 from google.protobuf.json_format import MessageToJson
 
 
+logger = logging.getLogger(__name__)
+
 class WriteSideHandlerImpl(WriteSideHandlerServiceServicer):
 
-    logger = logging.getLogger(__name__)
+
 
     def HandleCommand(self, request, context):
+        logger.debug("begin WriteSideHandlerImpl.HandleCommand")
         assert isinstance(request, HandleCommandRequest)
 
         # do stateful validation
-        StatefulValidation.validate(request)
+        # StatefulValidation.validate(request)
 
         # create event from request
         response = CommandHandler.handle_command(
@@ -27,6 +30,8 @@ class WriteSideHandlerImpl(WriteSideHandlerServiceServicer):
             current_state = request.current_state,
             meta = request.meta
         )
+
+        logger.debug(MessageToJson(response))
 
         return response
 

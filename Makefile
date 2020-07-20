@@ -28,7 +28,7 @@ ps:
 
 .phony: logs
 logs:
-	@ $(DCO) logs -f --tail="all" api write-handler cos postgres
+	@ $(DCO) logs -f --tail="all" api write-handler chiefofstate postgres
 
 .phony: build
 build:

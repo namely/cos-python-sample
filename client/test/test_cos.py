@@ -1,6 +1,6 @@
 import grpc
 from sample_app.api_pb2_grpc import SampleServiceStub
-from sample_app.api_pb2 import AppendRequest, GetRequest
+from sample_app.api_pb2 import AppendRequest, GetRequest, CreateRequest
 from chief_of_state.service_pb2_grpc import ChiefOfStateServiceStub
 from chief_of_state.service_pb2 import ProcessCommandRequest
 from google.protobuf.json_format import MessageToJson
@@ -17,10 +17,9 @@ class TestCos():
         print("TestCos.ProcessCommand")
 
         id = "x"
-        value = "y"
 
         # create a command
-        command = AppendRequest(id = id, append = value)
+        command = CreateRequest(id = id)
 
         # wrap in COS request
         cos_request = ProcessCommandRequest(

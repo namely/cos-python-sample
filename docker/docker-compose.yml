@@ -13,7 +13,7 @@ services:
     ports:
       - 9010:9010
     environment:
-      COS_HOST: "host.docker.internal"
+      COS_HOST: "chiefofstate"
       COS_PORT: "9000"
 
   write-handler:
@@ -36,9 +36,10 @@ services:
       - sleep
       - infinity
 
-  cos:
+  chiefofstate:
     image: registry.namely.land/namely/chief-of-state:0.1.0
     # image: cos-test:latest
+    hostname: chiefofstate
     depends_on:
       - postgres
     ports:

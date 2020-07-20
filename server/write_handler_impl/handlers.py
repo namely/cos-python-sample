@@ -42,6 +42,7 @@ class CommandHandler():
 
     @staticmethod
     def _handle_create(command, current_state, meta):
+        logger.debug("HANDLE CREATE COMMAND")
         real_command = CreateRequest()
         command.Unpack(real_command)
 
@@ -51,8 +52,10 @@ class CommandHandler():
         assert not real_current_state.id, f'id already exists {real_current_state.id}'
 
         event = CreateEvent(id=real_command.id)
+        output = CosHelpers.persist_and_reply(event)
+        logger.debug(MessageToJson(output))
 
-        return CosHelpers.persist_and_reply(event)
+        return output
 
     @staticmethod
     def _handle_append(command, current_state, meta):
