@@ -86,7 +86,8 @@ class EventHandler():
     @staticmethod
     def handle_event(event, current_state, meta):
         # build new state
-        new_state = State.CopyFrom(current_state)
+        new_state = State()
+        new_state.CopyFrom(current_state)
         new_state.values.append(event.appended)
 
         # create return
