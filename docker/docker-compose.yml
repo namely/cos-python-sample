@@ -6,7 +6,8 @@ services:
       dockerfile: ./docker/Dockerfile
     image: cos-python-sample
     volumes:
-      - ./server:/app/server
+      - ./code/server:/app/server
+      - ./code/cos_helpers:/app/lib/cos_helpers
     entrypoint:
       - python
       - run_app.py
@@ -20,7 +21,8 @@ services:
   write-handler:
     image: cos-python-sample:latest
     volumes:
-      - ./server:/app/server
+      - ./code/server:/app/server
+      - ./code/cos_helpers:/app/lib/cos_helpers
     entrypoint:
       - python
       - run_write_handler.py
@@ -34,7 +36,8 @@ services:
     container_name: test-client
     working_dir: /app/client
     volumes:
-      - ./client:/app/client
+      - ./code/client:/app/client
+      - ./code/cos_helpers:/app/lib/cos_helpers
     entrypoint:
       - sleep
       - infinity

@@ -14,7 +14,8 @@ from chief_of_state.writeside_pb2 import (
 )
 from chief_of_state.common_pb2 import MetaData
 from google.protobuf.any_pb2 import Any
-from test.helpers import get_channel, pack_any, unpack_any
+from cos_helpers.grpc import get_channel
+from cos_helpers.proto import ProtoHelper
 
 class TestHandler():
     @staticmethod
@@ -35,8 +36,8 @@ class TestHandler():
         meta = MetaData()
 
         request = HandleCommandRequest(
-            command=pack_any(cmd),
-            current_state=pack_any(current_state),
+            command=ProtoHelper.pack_any(cmd),
+            current_state=ProtoHelper.pack_any(current_state),
             meta=meta,
         )
 
@@ -61,8 +62,8 @@ class TestHandler():
         meta = MetaData(revision_number=1)
 
         request = HandleCommandRequest(
-            command=pack_any(command),
-            current_state=pack_any(current_state),
+            command=ProtoHelper.pack_any(command),
+            current_state=ProtoHelper.pack_any(current_state),
             meta=meta
         )
 
@@ -87,8 +88,8 @@ class TestHandler():
         meta = MetaData(revision_number=1)
 
         request = HandleCommandRequest(
-            command=pack_any(command),
-            current_state=pack_any(current_state),
+            command=ProtoHelper.pack_any(command),
+            current_state=ProtoHelper.pack_any(current_state),
             meta=meta
         )
 

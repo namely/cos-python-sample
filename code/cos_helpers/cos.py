@@ -3,7 +3,7 @@ from chief_of_state.writeside_pb2 import HandleCommandResponse, HandleEventRespo
 from google.protobuf.any_pb2 import Any
 
 
-class CosHelpers():
+class CosEventReplyTypes():
     @staticmethod
     def persist_and_reply(event):
         '''wrap event in command response with COS instruction PersistAndReply'''

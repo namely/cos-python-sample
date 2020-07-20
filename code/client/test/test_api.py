@@ -1,9 +1,7 @@
-import grpc
 from sample_app.api_pb2_grpc import SampleServiceStub
 from sample_app.api_pb2 import AppendRequest, GetRequest, CreateRequest
 from sample_app.state_pb2 import State
-from google.protobuf.json_format import MessageToJson
-from test.helpers import get_channel
+from cos_helpers.grpc import get_channel
 
 class TestApi():
     @staticmethod
