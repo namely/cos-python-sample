@@ -18,11 +18,9 @@ class TestApi():
     @staticmethod
     def create(stub):
         print("TestApi.create")
-        id = "x"
+        id = "api-test"
         request = CreateRequest(id = id)
         response = stub.CreateCall(request)
-        print(MessageToJson(response))
-
         assert isinstance(response, State)
         assert response.id == id
 
@@ -30,23 +28,23 @@ class TestApi():
     @staticmethod
     def append(stub):
         print("TestApi.append")
-        id = "x"
+        id = "api-test"
         value = "y"
         request = AppendRequest(id = id, append = value)
         response = stub.AppendCall(request)
-        print(MessageToJson(response))
         assert isinstance(response, State)
         assert response.id == id
+        assert value in response.values
 
     @staticmethod
     def get(stub):
         print("TestApi.get")
-        id = "x"
+        id = "api-test"
         value = "y"
         request = GetRequest(id = id)
         response = stub.GetCall(request)
-        print(MessageToJson(response))
-        print("done.")
+        assert isinstance(response, State)
+        assert response.id == id
 
 
 

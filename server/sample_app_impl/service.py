@@ -13,17 +13,17 @@ from .cos_client import CosClient
 from google.protobuf.json_format import MessageToJson
 
 
+logger = logging.getLogger(__name__)
+
 class SampleServiceImpl(SampleServiceServicer):
-    logger = logging.getLogger(__name__)
 
     def CreateCall(self, request, context):
-        self.logger.debug("begin CreateCall")
-        self.logger.debug(MessageToJson(request))
+        logger.debug("begin CreateCall")
+        logger.debug(MessageToJson(request))
         # do stateless validation
         StatelessValidation.validate(request)
         # send to chief of state, get resulting state
-        result = CosClient.process_command(request.id, request)
-        return result
+        return CosClient.process_command(request.id, request)
 
     def AppendCall(self, request, context):
         # do stateless validation

@@ -3,6 +3,7 @@ import grpc
 import logging
 from chief_of_state.service_pb2_grpc import ChiefOfStateServiceStub
 from chief_of_state.service_pb2 import ProcessCommandRequest
+from sample_app.state_pb2 import State
 from google.protobuf.any_pb2 import Any
 from google.protobuf.json_format import MessageToJson
 
@@ -32,10 +33,13 @@ class CosClient():
 
         try:
             response = stub.ProcessCommand(cos_request)
-            return response
+            logger.debug("CosClient call successful")
+            resulting_state = State()
+            response.state.Unpack(resulting_state)
+            return resulting_state
 
         except Exception as e:
-            logger.error("CosClientFailed", e)
+            logger.error("CosClient call failed", e)
             raise e
 
     @staticmethod
