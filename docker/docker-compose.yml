@@ -39,6 +39,8 @@ services:
       WRITE_HANDLER_PORT: "9011"
       COS_HOST: chiefofstate
       COS_PORT: "9000"
+    volumes:
+      - ./code/client:/app/client
 
   chiefofstate:
     image: registry.namely.land/namely/chief-of-state:master-5abf8c

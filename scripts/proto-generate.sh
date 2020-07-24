@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROTO_DIR=${PROTO_DIR:-".code/generated/"}
+PROTO_DIR=${PROTO_DIR:-"./.generated/"}
 
 echo "PROTO_DIR=$PROTO_DIR"
 

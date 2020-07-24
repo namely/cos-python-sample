@@ -47,4 +47,6 @@ down:
 
 .phony: restart
 restart:
-	@ $(DCO) restart -t 0 api write-handler
+	@ $(DCO) stop -t 0 api write-handler
+	@ $(DCO) rm -f api write-handler
+	@ $(DCO) up -d api write-handler
