@@ -50,7 +50,7 @@ services:
       COS_PORT: "9000"
 
   chiefofstate:
-    image: registry.namely.land/namely/chief-of-state:0.1.0
+    image: registry.namely.land/namely/chief-of-state:master-5abf8c
     # image: cos-test:latest
     hostname: chiefofstate
     depends_on:
