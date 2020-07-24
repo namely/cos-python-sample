@@ -18,7 +18,7 @@ class CosClient():
         command_any = ProtoHelper.pack_any(command)
 
         cos_request = ProcessCommandRequest(
-            entity_uuid = id,
+            entity_id = id,
             command = command_any
         )
 

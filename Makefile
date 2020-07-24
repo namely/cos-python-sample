@@ -15,8 +15,11 @@ protogen:
 
 .phony: test-client
 test-client:
-	@ $(DCO) up -d test-client
-	@ $(DCO) exec test-client bash
+	# @ $(DCO) exec test-client bash
+
+.phony: test
+test:
+	@ $(DCO) exec test-client python ./test_client.py
 
 .phony: dco
 dco:

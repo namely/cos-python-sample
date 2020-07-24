@@ -5,9 +5,6 @@ services:
       context: .
       dockerfile: ./docker/Dockerfile
     image: cos-python-sample
-    volumes:
-      - ./code/server:/app/server
-      - ./code/cos_helpers:/app/lib/cos_helpers
     entrypoint:
       - python
       - run_app.py
@@ -20,9 +17,6 @@ services:
 
   write-handler:
     image: cos-python-sample:latest
-    volumes:
-      - ./code/server:/app/server
-      - ./code/cos_helpers:/app/lib/cos_helpers
     entrypoint:
       - python
       - run_write_handler.py
@@ -35,9 +29,6 @@ services:
     image: cos-python-sample:latest
     container_name: test-client
     working_dir: /app/client
-    volumes:
-      - ./code/client:/app/client
-      - ./code/cos_helpers:/app/lib/cos_helpers
     entrypoint:
       - sleep
       - infinity
@@ -51,7 +42,6 @@ services:
 
   chiefofstate:
     image: registry.namely.land/namely/chief-of-state:master-5abf8c
-    # image: cos-test:latest
     hostname: chiefofstate
     depends_on:
       - postgres
@@ -63,13 +53,13 @@ services:
     environment:
       COS_ADDRESS: "0.0.0.0"
       COS_PORT: 9000
+      COS_SERVICE_NAME: "chiefofstate"
       WRITE_SIDE_HANDLER_SERVICE_HOST: write-handler
       WRITE_SIDE_HANDLER_SERVICE_PORT: 9011
-      HANDLER_SERVICE_STATE_PROTO: "com.namely.protobuf.chief_of_state.samples.State"
+      HANDLER_SERVICE_STATES_PROTO: "com.namely.protobuf.chief_of_state.samples.State"
       HANDLER_SERVICE_EVENTS_PROTOS: "com.namely.protobuf.chief_of_state.samples.AppendEvent,com.namely.protobuf.chief_of_state.samples.CreateEvent"
       TRACE_HOST: tracer
       TRACE_PORT: 14268
-      COS_SERVICE_NAME: "chiefofstate"
       NAMELY_ENV: "dev"
       TEAM_NAME: "data"
       COS_POSTGRES_USER: "postgres"
