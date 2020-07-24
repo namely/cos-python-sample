@@ -32,8 +32,6 @@ services:
       - run_read_handler.py
     ports:
       - 9012:9012
-    volumes:
-      - ./code/server:/app/server
     environment:
       APP_PORT: "9012"
 
