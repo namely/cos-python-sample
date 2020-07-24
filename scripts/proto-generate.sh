@@ -25,6 +25,12 @@ python -m grpc_tools.protoc \
     -I./submodules/chief-of-state-protos/ \
     --python_out=$PROTO_DIR \
     --grpc_python_out=$PROTO_DIR \
+    ./submodules/chief-of-state-protos/chief_of_state/readside.proto
+
+python -m grpc_tools.protoc \
+    -I./submodules/chief-of-state-protos/ \
+    --python_out=$PROTO_DIR \
+    --grpc_python_out=$PROTO_DIR \
     ./submodules/chief-of-state-protos/chief_of_state/common.proto
 
 python -m grpc_tools.protoc \

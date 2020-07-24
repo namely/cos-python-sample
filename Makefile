@@ -31,7 +31,7 @@ ps:
 
 .phony: logs
 logs:
-	@ $(DCO) logs -f --tail="all" api write-handler chiefofstate postgres
+	@ $(DCO) logs -f --tail="all" api write-handler read-handler chiefofstate postgres
 
 .phony: build
 build:
@@ -47,6 +47,6 @@ down:
 
 .phony: restart
 restart:
-	@ $(DCO) stop -t 0 api write-handler
-	@ $(DCO) rm -f api write-handler
-	@ $(DCO) up -d api write-handler
+	@ $(DCO) stop -t 0 api write-handler read-handler
+	@ $(DCO) rm -f api write-handler read-handler
+	@ $(DCO) up -d api write-handler read-handler

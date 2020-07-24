@@ -25,6 +25,18 @@ services:
     environment:
       APP_PORT: "9011"
 
+  read-handler:
+    image: cos-python-sample:latest
+    entrypoint:
+      - python
+      - run_read_handler.py
+    ports:
+      - 9012:9012
+    volumes:
+      - ./code/server:/app/server
+    environment:
+      APP_PORT: "9012"
+
   test-client:
     image: cos-python-sample:latest
     container_name: test-client
@@ -72,15 +84,17 @@ services:
       COS_POSTGRES_SCHEMA: "public"
       COS_EVENTS_BATCH_THRESHOLD: 2
       COS_NUM_SNAPSHOTS_TO_RETAIN: 2
-      COS_READ_SIDE_ENABLED: "false"
+      COS_READ_SIDE_ENABLED: "true"
       COS_READ_SIDE_OFFSET_DB_HOST: "postgres"
       COS_READ_SIDE_OFFSET_DB_PORT: 5432
       COS_READ_SIDE_OFFSET_DB_USER: "postgres"
       COS_READ_SIDE_OFFSET_DB_PASSWORD: "changeme"
       COS_READ_SIDE_OFFSET_DB: "postgres"
       COS_READ_SIDE_OFFSET_DB_SCHEMA: "public"
-      READ_SIDE_HANDLER_SERVICE_HOST: host.docker.internal
-      READ_SIDE_HANDLER_SERVICE_PORT: 50053
+      READ_SIDE_HANDLER_SERVICE_HOST: x
+      READ_SIDE_HANDLER_SERVICE_PORT: 9999
+      COS_READSIDE_CONFIG__HOST__LOGGER_READSIDE: read-handler
+      COS_READSIDE_CONFIG__PORT__LOGGER_READSIDE: 9012
       JAVA_OPTS: "-Dconfig.resource=docker.conf"
 
   postgres:
