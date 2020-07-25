@@ -33,6 +33,11 @@ ps:
 logs:
 	@ $(DCO) logs -f --tail="all" api write-handler read-handler chiefofstate postgres
 
+.phony: logs-apps
+logs-apps:
+	@ $(DCO) logs -f --tail="all" api write-handler read-handler
+
+
 .phony: build
 build:
 	@ $(DCO) build

@@ -53,7 +53,7 @@ services:
       - ./code/client:/app/client
 
   chiefofstate:
-    image: registry.namely.land/namely/chief-of-state:master-5abf8c
+    image: registry.namely.land/namely/chief-of-state:master-9cff63
     hostname: chiefofstate
     depends_on:
       - postgres
@@ -96,7 +96,7 @@ services:
       JAVA_OPTS: "-Dconfig.resource=docker.conf"
 
   postgres:
-    image: postgres
+    image: postgres:9.6
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
@@ -107,7 +107,7 @@ services:
       - "5432:5432"
 
   pgadmin:
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:4.24
     environment:
       PGADMIN_DEFAULT_EMAIL: "admin@namely.com"
       PGADMIN_DEFAULT_PASSWORD: "admin"
