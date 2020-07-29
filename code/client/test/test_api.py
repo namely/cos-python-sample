@@ -9,15 +9,15 @@ class TestApi():
         channel = get_channel(host, port)
         stub = SampleServiceStub(channel)
 
-        # for i in range(0,1):
-        #     id = f'some-id-{i}'
-        #     TestApi.create(stub, id)
-        #     TestApi.append(stub, id, i)
-        #     TestApi.get(stub, id)
+        for i in range(0,1):
+            id = f'some-id-{i}'
+            TestApi.create(stub, id)
+            TestApi.append(stub, id, i)
+            TestApi.get(stub, id)
 
         # id = "x"
         # TestApi.create(stub, id)
-        TestApi.handler_failure(stub)
+        # TestApi.handler_failure(stub)
 
     @staticmethod
     def create(stub, id):

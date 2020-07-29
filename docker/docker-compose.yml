@@ -47,8 +47,7 @@ services:
       API_PORT: "9010"
       WRITE_HANDLER_HOST: write-handler
       WRITE_HANDLER_PORT: "50052"
-      # COS_HOST: chiefofstate
-      COS_HOST: "host.docker.internal"
+      COS_HOST: chiefofstate
       COS_PORT: "9000"
     volumes:
       - ./code/client:/app/client
@@ -84,7 +83,7 @@ services:
       COS_POSTGRES_SCHEMA: "public"
       COS_EVENTS_BATCH_THRESHOLD: 2
       COS_NUM_SNAPSHOTS_TO_RETAIN: 2
-      COS_READ_SIDE_ENABLED: "false"
+      COS_READ_SIDE_ENABLED: "true"
       COS_READ_SIDE_OFFSET_DB_HOST: "postgres"
       COS_READ_SIDE_OFFSET_DB_PORT: 5432
       COS_READ_SIDE_OFFSET_DB_USER: "postgres"
