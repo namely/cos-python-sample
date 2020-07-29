@@ -11,7 +11,7 @@ services:
     ports:
       - 9010:9010
     environment:
-      COS_HOST: "host.docker.internal"
+      COS_HOST: "chiefofstate"
       COS_PORT: "9000"
       APP_PORT: "9010"
 
