@@ -9,15 +9,15 @@ class TestApi():
         channel = get_channel(host, port)
         stub = SampleServiceStub(channel)
 
-        for i in range(0,10):
-            id = f'some-id-{i}'
-            TestApi.create(stub, id)
-            TestApi.append(stub, id, i)
-            TestApi.get(stub, id)
+        # for i in range(0,1):
+        #     id = f'some-id-{i}'
+        #     TestApi.create(stub, id)
+        #     TestApi.append(stub, id, i)
+        #     TestApi.get(stub, id)
 
+        # id = "x"
         # TestApi.create(stub, id)
-        # TestApi.append(stub, id)
-        # TestApi.get(stub, id)
+        TestApi.handler_failure(stub)
 
     @staticmethod
     def create(stub, id):
@@ -46,7 +46,16 @@ class TestApi():
         assert isinstance(response, State)
         assert response.id == id
 
-
+    def handler_failure(stub):
+        print("TestApi.handler_failure")
+        request = CreateRequest(id = "") # will throw
+        try:
+            stub.CreateCall(request)
+        except Exception as e:
+            print(e)
+            # code = e.code()
+            # assert e.code() == grpc.StatusCode.INVALID_ARGUMENT, e
+            # assert e.details() == "invalid command, ID required", e.details()
 
 if __name__ == '__main__':
     TestApi.run()

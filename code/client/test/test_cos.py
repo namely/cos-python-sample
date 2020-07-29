@@ -14,8 +14,10 @@ class TestCos():
         channel = get_channel(host, port)
         stub = ChiefOfStateServiceStub(channel)
 
-        TestCos._test_create(stub)
-        TestCos._test_append(stub)
+        # TestCos._test_create(stub)
+        # TestCos._test_append(stub)
+        TestCos._test_fail_append(stub)
+        TestCos._test_fail_id(stub)
 
     @staticmethod
     def _test_create(stub):
@@ -37,6 +39,7 @@ class TestCos():
         output_state = ProtoHelper.unpack_any(response.state, State)
         assert output_state.id == id
 
+    @staticmethod
     def _test_append(stub):
         print("TestCos.AppendRequest")
 
@@ -56,6 +59,46 @@ class TestCos():
         output_state = ProtoHelper.unpack_any(response.state, State)
         assert output_state.id == id
         assert output_state.values == ['new']
+
+    @staticmethod
+    def _test_fail_append(stub):
+        print("TestCos.failure")
+
+        # create a command
+        id = "bad-id"
+        command = AppendRequest(id = id)
+
+        # wrap in COS request
+        try:
+            stub.ProcessCommand(
+                ProcessCommandRequest(
+                    entity_id=id,
+                    command=ProtoHelper.pack_any(command)
+                )
+            )
+
+        except Exception as e:
+            print(e)
+
+    @staticmethod
+    def _test_fail_id(stub):
+        print("TestCos.failure")
+
+        # create a command
+        id = ""
+        command = AppendRequest(id = id, append="x")
+
+        # wrap in COS request
+        try:
+            stub.ProcessCommand(
+                ProcessCommandRequest(
+                    entity_id=id,
+                    command=ProtoHelper.pack_any(command)
+                )
+            )
+
+        except Exception as e:
+            print(e)
 
 
 if __name__ == '__main__':
