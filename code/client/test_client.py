@@ -14,6 +14,6 @@ if __name__ == '__main__':
     api_host = os.environ.get("API_HOST") or "api"
     api_port = os.environ.get("API_PORT")
 
-    # TestHandler.run(host = write_handler_host, port = write_handler_port)
-    # TestCos.run(host = cos_host, port = cos_port)
+    TestHandler.run(host = write_handler_host, port = write_handler_port)
+    TestCos.run(host = cos_host, port = cos_port)
     TestApi.run(host = api_host, port = api_port)

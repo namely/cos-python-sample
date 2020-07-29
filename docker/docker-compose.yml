@@ -64,6 +64,7 @@ services:
       - 9095:9095
       - 5266:5266
     environment:
+      LOG_LEVEL: INFO
       COS_ADDRESS: "0.0.0.0"
       COS_PORT: 9000
       COS_SERVICE_NAME: "chiefofstate"

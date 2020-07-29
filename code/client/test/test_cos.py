@@ -6,6 +6,7 @@ from chief_of_state.service_pb2_grpc import ChiefOfStateServiceStub
 from chief_of_state.service_pb2 import ProcessCommandRequest
 from cos_helpers.proto import ProtoHelper
 from cos_helpers.grpc import get_channel
+from uuid import uuid4
 
 
 class TestCos():
@@ -14,16 +15,15 @@ class TestCos():
         channel = get_channel(host, port)
         stub = ChiefOfStateServiceStub(channel)
 
-        # TestCos._test_create(stub)
-        # TestCos._test_append(stub)
+        id = uuid4().hex
+        TestCos._test_create(stub, id)
+        TestCos._test_append(stub, id)
         TestCos._test_fail_append(stub)
         TestCos._test_fail_id(stub)
 
     @staticmethod
-    def _test_create(stub):
+    def _test_create(stub, id):
         print("TestCos.CreateRequest")
-
-        id = "test-cos"
         # create a command
         command = CreateRequest(id = id)
 
@@ -40,10 +40,9 @@ class TestCos():
         assert output_state.id == id
 
     @staticmethod
-    def _test_append(stub):
+    def _test_append(stub, id):
         print("TestCos.AppendRequest")
 
-        id = "test-cos"
         # create a command
         command = AppendRequest(id = id, append = 'new')
 
@@ -57,15 +56,17 @@ class TestCos():
         response = stub.ProcessCommand(cos_request)
 
         output_state = ProtoHelper.unpack_any(response.state, State)
-        assert output_state.id == id
-        assert output_state.values == ['new']
+
+        assert output_state.id == id, output_state
+        assert output_state.values == ['new'], output_state.values
 
     @staticmethod
     def _test_fail_append(stub):
-        print("TestCos.failure")
+        print("TestCos.fail_append")
+        did_fail = False
 
         # create a command
-        id = "bad-id"
+        id = uuid4().hex
         command = AppendRequest(id = id)
 
         # wrap in COS request
@@ -78,11 +79,15 @@ class TestCos():
             )
 
         except Exception as e:
-            print(e)
+            did_fail = True
+            assert 'cannot append empty value' in e.details().lower()
+
+        assert did_fail
 
     @staticmethod
     def _test_fail_id(stub):
-        print("TestCos.failure")
+        print("TestCos.fail_id")
+        did_fail = False
 
         # create a command
         id = ""
@@ -98,7 +103,10 @@ class TestCos():
             )
 
         except Exception as e:
-            print(e)
+            did_fail = True
+            assert 'empty entity id' in e.details().lower()
+
+        assert did_fail
 
 
 if __name__ == '__main__':

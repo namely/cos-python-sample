@@ -21,7 +21,14 @@ class SampleServiceImpl(SampleServiceServicer):
         # do stateless validation
         StatelessValidation.validate(request)
         # send to chief of state, get resulting state
-        return CosClient.process_command(request.id, request)
+        try:
+            return CosClient.process_command(request.id, request)
+        except Exception as e:
+            print(e.code())
+            print("DETAILS ******")
+            print(e.details())
+            logger.error(f'cos failed, code=({e.code()}), details=({e.details()})')
+            raise e
 
     def GetCall(self, request, context):
         logger.info("SampleServiceImpl.GetCall")
