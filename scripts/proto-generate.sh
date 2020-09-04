@@ -19,22 +19,22 @@ python -m grpc_tools.protoc \
     -I./submodules/chief-of-state-protos/ \
     --python_out=$PROTO_DIR \
     --grpc_python_out=$PROTO_DIR \
-    ./submodules/chief-of-state-protos/chief_of_state/writeside.proto
+    ./submodules/chief-of-state-protos/chief_of_state/v1/writeside.proto
 
 python -m grpc_tools.protoc \
     -I./submodules/chief-of-state-protos/ \
     --python_out=$PROTO_DIR \
     --grpc_python_out=$PROTO_DIR \
-    ./submodules/chief-of-state-protos/chief_of_state/readside.proto
+    ./submodules/chief-of-state-protos/chief_of_state/v1/readside.proto
 
 python -m grpc_tools.protoc \
     -I./submodules/chief-of-state-protos/ \
     --python_out=$PROTO_DIR \
     --grpc_python_out=$PROTO_DIR \
-    ./submodules/chief-of-state-protos/chief_of_state/common.proto
+    ./submodules/chief-of-state-protos/chief_of_state/v1/common.proto
 
 python -m grpc_tools.protoc \
     -I./submodules/chief-of-state-protos/ \
     --python_out=$PROTO_DIR \
     --grpc_python_out=$PROTO_DIR \
-    ./submodules/chief-of-state-protos/chief_of_state/service.proto
+    ./submodules/chief-of-state-protos/chief_of_state/v1/service.proto

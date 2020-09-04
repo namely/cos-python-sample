@@ -1,5 +1,5 @@
 from write_handler_impl.service import WriteSideHandlerImpl
-from chief_of_state.writeside_pb2_grpc import add_WriteSideHandlerServiceServicer_to_server
+from chief_of_state.v1.writeside_pb2_grpc import add_WriteSideHandlerServiceServicer_to_server
 from cos_helpers.logging import configure_logging
 import os
 import logging

@@ -3,7 +3,7 @@ import logging
 import grpc
 from concurrent import futures
 from read_handler_impl.service import ReadSideHandlerImpl
-from chief_of_state.readside_pb2_grpc import add_ReadSideHandlerServiceServicer_to_server
+from chief_of_state.v1.readside_pb2_grpc import add_ReadSideHandlerServiceServicer_to_server
 from cos_helpers.logging import configure_logging
 
 

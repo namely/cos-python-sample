@@ -37,6 +37,9 @@ logs:
 logs-apps:
 	@ $(DCO) logs -f --tail="all" api write-handler read-handler
 
+.phony: logs-cos
+logs-cos:
+	@ $(DCO) logs -f chiefofstate
 
 .phony: build
 build:
@@ -49,6 +52,11 @@ up:
 .phony: down
 down:
 	@ $(DCO) down -t 0 --remove-orphans
+
+.phony: down-cos
+down-cos:
+	@ $(DCO) kill chiefofstate
+	@ $(DCO) rm -f chiefofstate
 
 .phony: restart
 restart:
