@@ -23,10 +23,9 @@ class TestHandler():
         channel = get_channel(host, port)
         stub = WriteSideHandlerServiceStub(channel)
 
-        # TestHandler.handleCommandCreate(stub)
-        # TestHandler.handleCommandAppend(stub)
-        # TestHandler.handleCommandGet(stub)
-
+        TestHandler.handleCommandCreate(stub)
+        TestHandler.handleCommandAppend(stub)
+        TestHandler.handleCommandGet(stub)
         TestHandler.testFailure(stub)
 
     @staticmethod

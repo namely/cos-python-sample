@@ -1,4 +1,4 @@
-DCO := docker-compose --project-directory . -f ./docker/docker-compose.yml
+DCO := docker-compose
 
 .phony: setup
 setup:
@@ -15,11 +15,11 @@ protogen:
 
 .phony: test-client
 test-client:
-	# @ $(DCO) exec test-client bash
+	@ $(DCO) exec test-client bash
 
 .phony: test
 test:
-	@ $(DCO) exec test-client python ./test_client.py
+	@ $(DCO) exec test-client python -m test
 
 .phony: dco
 dco:
@@ -63,3 +63,9 @@ restart:
 	@ $(DCO) stop -t 0 api write-handler read-handler
 	@ $(DCO) rm -f api write-handler read-handler
 	@ $(DCO) up -d api write-handler read-handler
+
+.phony: reload-cos
+reload-cos:
+	@ $(DCO) stop -t 0 chiefofstate
+	@ $(DCO) rm -f chiefofstate
+	@ $(DCO) up -d chiefofstate

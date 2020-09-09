@@ -1,19 +1,23 @@
+from sample_app_impl.service import SampleServiceImpl
+from cos_helpers.logging import configure_logging
+from sample_app.api_pb2_grpc import add_SampleServiceServicer_to_server
 import os
 import logging
 import grpc
 from concurrent import futures
-from read_handler_impl.service import ReadSideHandlerImpl
-from chief_of_state.v1.readside_pb2_grpc import add_ReadSideHandlerServiceServicer_to_server
-from cos_helpers.logging import configure_logging
 
 
 def run(port):
     configure_logging()
-    logging.info(f"starting server, {port}")
+    # define grpc server
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    add_ReadSideHandlerServiceServicer_to_server(ReadSideHandlerImpl(), server)
+    # add grpc implementation to server
+    add_SampleServiceServicer_to_server(SampleServiceImpl(), server)
+    # set port
     server.add_insecure_port(f'[::]:{port}')
+    # start
     server.start()
+    logging.info(f"started server, {port}")
     server.wait_for_termination()
     logging.info("killing server")
 
