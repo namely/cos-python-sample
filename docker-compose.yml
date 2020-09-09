@@ -75,8 +75,6 @@ services:
       HANDLER_SERVICE_ENABLE_PROTO_VALIDATION: "false"
       TRACE_HOST: tracer
       TRACE_PORT: 14268
-      NAMELY_ENV: "dev"
-      TEAM_NAME: "data"
       COS_POSTGRES_USER: "postgres"
       COS_POSTGRES_PASSWORD: "changeme"
       COS_POSTGRES_HOST: "postgres"
