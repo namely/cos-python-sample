@@ -5,16 +5,6 @@ from google.protobuf.empty_pb2 import Empty
 
 class CosCommandResponses():
     @staticmethod
-    def persist_and_reply(event):
-        return CosCommandResponses.event(event)
-
-    @staticmethod
-    def reply():
-        '''helper method for generating a reply message'''
-        return CosCommandResponses.no_event()
-
-
-    @staticmethod
     def event(event):
         '''helper method for generating an event message'''
         any_event = Any()
