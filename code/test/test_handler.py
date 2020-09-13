@@ -95,7 +95,7 @@ class TestHandler():
         response = stub.HandleCommand(request)
 
         assert isinstance(response, HandleCommandResponse)
-        assert response.HasField("no_event")
+        assert not response.HasField("event"), "expecting null event"
 
     def testFailure(stub):
         print("TestHandler.testFailure")

@@ -1,6 +1,5 @@
 from chief_of_state.v1.writeside_pb2 import HandleCommandResponse
 from google.protobuf.any_pb2 import Any
-from google.protobuf.empty_pb2 import Empty
 
 
 class CosCommandResponses():
@@ -15,4 +14,4 @@ class CosCommandResponses():
     @staticmethod
     def no_event():
         '''helper method for generating a no event message'''
-        return HandleCommandResponse(no_event=Empty())
+        return HandleCommandResponse()
