@@ -6,10 +6,10 @@ import "google/protobuf/any.proto";
 import "banking_app/state.proto";
 
 
-service AccountGrpcService {
+service BankAccountService {
   rpc OpenAccount(OpenAccountRequest) returns (ApiResponse);
-  rpc DebitAccount(TransferMoneyRequest) returns (ApiResponse);
-  rpc CreditAccount(ReceiveMoneyRequest) returns (ApiResponse);
+  rpc DebitAccount(DebitAccountRequest) returns (ApiResponse);
+  rpc CreditAccount(CreditAccountRequest) returns (ApiResponse);
   rpc Get(GetAccountRequest) returns (ApiResponse);
 }
 
@@ -18,21 +18,20 @@ message OpenAccountRequest {
   double balance = 2;
 }
 
-message TransferMoneyRequest {
+message DebitAccountRequest {
   string account_id = 1;
   double amount = 2;
 }
 
-message ReceiveMoneyRequest {
+message CreditAccountRequest {
   string account_id = 1;
   double amount = 2;
 }
 
 message GetAccountRequest {
-  string company_uuid = 1;
-  string account_id = 2;
+  string account_id = 1;
 }
 
 message ApiResponse {
-  com.namely.protobuf.account.BankAccount bank_account = 1;
+  com.namely.protobuf.account.BankAccount account = 1;
 }
