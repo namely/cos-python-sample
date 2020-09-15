@@ -2,7 +2,7 @@ import logging
 from google.protobuf.json_format import MessageToJson
 from sample_app.api_pb2_grpc import SampleServiceServicer
 from .validation import StatelessValidation
-from .cos_client import CosClient
+from shared.cos import CosClient
 from grpc import StatusCode
 from sample_app.state_pb2 import State
 
@@ -29,10 +29,6 @@ class SampleServiceImpl(SampleServiceServicer):
             result = CosClient.process_command(request.id, request)
             return self._handle_state_response(result, context)
         except Exception as e:
-            # print(e.code())
-            print("DETAILS ******")
-            # print(e.details())
-            # logger.error(f'cos failed, code=({e.code()}), details=({e.details()})')
             raise e
 
     def GetCall(self, request, context):
