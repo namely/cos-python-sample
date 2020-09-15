@@ -43,3 +43,13 @@ docker-compose logs -f --tail="all" api write-handler read-handler
 # cos logs
 docker-compose logs -f chiefofstate
 ```
+
+### installing dependencies for local dev in an IDE
+```bash
+# configure virtual env
+python -m venv .venv
+# activate it
+. .venv/bin/activate
+# install dependencies
+pip install -r requirements.txt
+```
