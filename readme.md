@@ -29,9 +29,6 @@ earth +all
 # starts all containers
 docker-compose up -d
 
-# run sample commands
-docker-compose exec test-client python -m test
-
 # OTHER HELPFUL COMMANDS
 
 # only generate protobufs locally
