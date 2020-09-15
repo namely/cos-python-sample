@@ -1,5 +1,5 @@
 from sample_app_impl.service import SampleServiceImpl
-from cos_helpers.logging import configure_logging
+from shared.logging import configure_logging
 from sample_app.api_pb2_grpc import add_SampleServiceServicer_to_server
 import os
 import logging

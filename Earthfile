@@ -15,7 +15,7 @@ build-base:
     COPY -dir +protogen/sample_app .
     COPY -dir +protogen/chief_of_state .
 
-    COPY -dir code/cos_helpers .
+    COPY -dir code/shared .
 
     SAVE IMAGE
 

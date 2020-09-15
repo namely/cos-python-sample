@@ -2,8 +2,8 @@ import os
 import logging
 from chief_of_state.v1.service_pb2_grpc import ChiefOfStateServiceStub
 from chief_of_state.v1.service_pb2 import ProcessCommandRequest, GetStateRequest
-from cos_helpers.proto import ProtoHelper
-from cos_helpers.grpc import get_channel
+from shared.proto import ProtoHelper
+from shared.grpc import get_channel
 from sample_app.state_pb2 import State
 from google.protobuf.empty_pb2 import Empty
 from google.protobuf.any_pb2 import Any
