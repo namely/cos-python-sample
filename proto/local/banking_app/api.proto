@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package com.namely.protobuf.account;
+
+import "google/protobuf/any.proto";
+import "banking_app/state.proto";
+
+
+service AccountGrpcService {
+  rpc OpenAccount(OpenAccountRequest) returns (ApiResponse);
+  rpc DebitAccount(TransferMoneyRequest) returns (ApiResponse);
+  rpc CreditAccount(ReceiveMoneyRequest) returns (ApiResponse);
+  rpc Get(GetAccountRequest) returns (ApiResponse);
+}
+
+message OpenAccountRequest {
+  string account_owner = 1;
+  double balance = 2;
+}
+
+message TransferMoneyRequest {
+  string account_id = 1;
+  double amount = 2;
+}
+
+message ReceiveMoneyRequest {
+  string account_id = 1;
+  double amount = 2;
+}
+
+message GetAccountRequest {
+  string company_uuid = 1;
+  string account_id = 2;
+}
+
+message ApiResponse {
+  com.namely.protobuf.account.BankAccount bank_account = 1;
+}
