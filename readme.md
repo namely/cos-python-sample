@@ -8,6 +8,17 @@ This sample application uses Chief of State to build [state](./proto/local/sampl
 manages an array of strings and accepts [requests](./proto/local/sample_app/api.proto) to append more strings. State is derived from
 [events](./proto/local/sample_app/events.proto).
 
+```
+code
+├── chief_of_state          # generated COS code
+├── shared                  # shared helpers
+├── read_handler_impl       # implements the read side
+├── sample_app              # generated APP code
+├── sample_app_impl         # implements the gRPC service
+├── test                    # test client
+└── write_handler_impl      # implements the write side
+```
+
 ### Quickstart
 
 ```bash
