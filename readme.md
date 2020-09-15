@@ -48,8 +48,10 @@ docker-compose logs -f chiefofstate
 ```bash
 # configure virtual env
 python -m venv .venv
+
 # activate it
 . .venv/bin/activate
+
 # install dependencies
 pip install -r requirements.txt
 ```
