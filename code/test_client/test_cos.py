@@ -1,147 +1,154 @@
-from sample_app.api_pb2_grpc import SampleServiceStub
-from sample_app.api_pb2 import AppendRequest, CreateRequest
-from sample_app.events_pb2 import AppendEvent, CreateEvent
-from sample_app.state_pb2 import State
-from chief_of_state.v1.service_pb2_grpc import ChiefOfStateServiceStub
-from chief_of_state.v1.service_pb2 import ProcessCommandRequest, GetStateRequest
-from shared.proto import ProtoHelper
-from shared.grpc import get_channel
 from uuid import uuid4
 from grpc import StatusCode
 from google.protobuf.empty_pb2 import Empty
+import logging
 
+from banking_app.api_pb2_grpc import BankAccountServiceStub
+from banking_app.api_pb2 import *
+from banking_app.events_pb2 import *
+from banking_app.state_pb2 import *
+
+from chief_of_state.v1.service_pb2_grpc import ChiefOfStateServiceStub
+from chief_of_state.v1.service_pb2 import ProcessCommandRequest, GetStateRequest
+
+from shared.proto import *
+from shared.grpc import *
+
+logger = logging.getLogger("chief-of-state")
 
 class TestCos():
     @staticmethod
     def run(host, port):
         channel = get_channel(host, port)
         stub = ChiefOfStateServiceStub(channel)
-
-        TestCos._test_noop(stub)
-
-        id = uuid4().hex
-        TestCos._test_create(stub, id)
-        TestCos._test_append(stub, id)
-        TestCos._test_fail_append(stub)
-        TestCos._test_fail_id(stub)
-        TestCos._test_fail_get(stub)
+        # test state
+        id = str(uuid4())
+        TestCos._create(stub, id)
+        TestCos._update(stub, id)
+        TestCos._fail(stub, id)
+        # test general
+        TestCos._no_op(stub)
+        TestCos._bad_request(stub)
+        TestCos._not_found(stub)
 
     @staticmethod
-    def _test_noop(stub):
-        print("TestCos.NoOp")
-        id = uuid4().hex
+    def _no_op(stub):
+        logger.info("no-op")
+        id = str(uuid4)
         # create a command
-        command = AppendRequest(id = id, append = 'no-op')
+        command = GetAccountRequest(account_id=id)
         # wrap in COS request
         cos_request = ProcessCommandRequest(
             entity_id = id,
-            command = ProtoHelper.pack_any(command)
+            command = pack_any(command)
         )
         # send to COS
         response = stub.ProcessCommand(cos_request)
-        assert 'google.protobuf.Empty' in response.state.type_url, "expecting an empty!"
+        # get back a google.protobuf.Empty
+        unpack_any(response.state, Empty)
 
     @staticmethod
-    def _test_create(stub, id):
-        print("TestCos.CreateRequest")
+    def _create(stub, id):
+        logger.info("create state")
         # create a command
-        command = CreateRequest(id = id)
-
-        # wrap in COS request
-        cos_request = ProcessCommandRequest(
-            entity_id = id,
-            command = ProtoHelper.pack_any(command)
-        )
-
-        # send to COS
-        response = stub.ProcessCommand(cos_request)
-
-        output_state = ProtoHelper.unpack_any(response.state, State)
-        assert output_state.id == id
-
-    @staticmethod
-    def _test_append(stub, id):
-        print("TestCos.AppendRequest")
-
-        # create a command
-        command = AppendRequest(id = id, append = 'new')
+        command = OpenAccountRequest(account_owner="some owner", balance=200)
 
         # wrap in COS request
         cos_request = ProcessCommandRequest(
             entity_id = id,
-            command = ProtoHelper.pack_any(command)
+            command = pack_any(command)
         )
 
         # send to COS
         response = stub.ProcessCommand(cos_request)
+        assert response.meta.revision_number == 1
 
-        output_state = ProtoHelper.unpack_any(response.state, State)
-
-        assert output_state.id == id, output_state
-        assert output_state.values == ['new'], output_state.values
+        output_state = unpack_any(response.state, BankAccount)
+        assert output_state.account_id == id
+        assert output_state.account_balance == 200
+        assert output_state.account_owner == "some owner"
 
     @staticmethod
-    def _test_fail_append(stub):
-        print("TestCos.fail_append")
+    def _update(stub, id):
+        logger.info("update state")
+
+        # create a command
+        command = DebitAccountRequest(amount=1)
+
+        # wrap in COS request
+        cos_request = ProcessCommandRequest(
+            entity_id = id,
+            command = pack_any(command)
+        )
+
+        # send to COS
+        response = stub.ProcessCommand(cos_request)
+        assert response.meta.revision_number == 2
+
+        output_state = unpack_any(response.state, BankAccount)
+
+        assert output_state.account_id == id, output_state
+        assert output_state.account_balance == 199
+
+
+    @staticmethod
+    def _fail(stub, id):
+        logger.info("fail command")
         did_fail = False
 
-        # create a command
-        id = uuid4().hex
-        command = AppendRequest(id = id)
+        command = DebitAccountRequest(amount=999)
 
         # wrap in COS request
         try:
             stub.ProcessCommand(
                 ProcessCommandRequest(
                     entity_id=id,
-                    command=ProtoHelper.pack_any(command)
+                    command=pack_any(command)
                 )
             )
 
         except Exception as e:
             did_fail = True
-            assert 'cannot append empty value' in e.details().lower()
+            assert 'insufficient funds' in e.details().lower()
 
         assert did_fail
 
     @staticmethod
-    def _test_fail_id(stub):
-        print("TestCos.fail_id")
+    def _bad_request(stub):
+        logger.info("bad request")
         did_fail = False
-
-        # create a command
-        id = ""
-        command = AppendRequest(id = id, append="x")
 
         # wrap in COS request
         try:
             stub.ProcessCommand(
                 ProcessCommandRequest(
-                    entity_id=id,
-                    command=ProtoHelper.pack_any(command)
+                    entity_id="",
+                    command=pack_any(Empty())
                 )
             )
 
-        except Exception as e:
+        except grpc.RpcError as e:
             did_fail = True
+            assert e.code() == StatusCode.INVALID_ARGUMENT
             assert 'empty entity id' in e.details().lower()
 
         assert did_fail
 
 
     @staticmethod
-    def _test_fail_get(stub):
-        print("TestCos.fail_get")
+    def _not_found(stub):
+        logger.info("not found")
         did_fail = False
 
         # create a command
-        command = GetStateRequest(entity_id="not-an-id")
+        bad_id = str(uuid4())
+        command = GetStateRequest(entity_id=bad_id)
 
         # wrap in COS request
         try:
             stub.GetState(command)
 
-        except Exception as e:
+        except grpc.RpcError as e:
             did_fail = True
             assert e.code() == StatusCode.NOT_FOUND, f'wrong error code, {e.code()}'
 

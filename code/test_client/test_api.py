@@ -1,112 +1,143 @@
-from sample_app.api_pb2_grpc import SampleServiceStub
-from sample_app.api_pb2 import AppendRequest, GetRequest, CreateRequest
-from sample_app.state_pb2 import State
-from shared.grpc import get_channel
-from shared.proto import ProtoHelper
 from google.protobuf.empty_pb2 import Empty
 from uuid import uuid4
+import logging
 import grpc
 from grpc import StatusCode, RpcError
+
+from banking_app.api_pb2_grpc import BankAccountServiceStub
+from banking_app.api_pb2 import *
+from banking_app.state_pb2 import BankAccount
+
+from shared.grpc import get_channel
+from shared.proto import *
+
+logger = logging.getLogger("banking-app")
 
 class TestApi():
     @staticmethod
     def run(host, port):
         channel = get_channel(host, port)
-        stub = SampleServiceStub(channel)
+        stub = BankAccountServiceStub(channel)
 
-        TestApi.test_noop(stub)
+        TestApi._missing_account(stub)
+        TestApi._validation_fail(stub)
+        TestApi._not_found(stub)
+        TestApi._no_op(stub)
 
-        ids = [uuid4().hex for i in range(10)]
+        # create and do transactions against many accounts
+        balances = {}
 
-        for id in ids:
-            TestApi.create(stub, id)
+        for _ in range(10):
+            id = TestApi._open(stub)
+            balances[id] = 200
 
-        for id in ids:
-            TestApi.append(stub, id, str(uuid4().int))
+        for id in balances.keys():
+            TestApi._debit(stub, id, balances)
 
-        for id in ids:
-            TestApi.get(stub, id)
+        for id in balances.keys():
+            TestApi._credit(stub, id, balances)
 
-        TestApi.get_failure(stub)
-        TestApi.handler_failure_id(stub)
-        TestApi.handler_validation_failure(stub)
-
-
-    @staticmethod
-    def create(stub, id):
-        print("TestApi.create")
-        request = CreateRequest(id = id)
-        response = stub.CreateCall(request)
-        assert isinstance(response, State)
-        assert response.id == id
-
+        for id in balances.keys():
+            TestApi._get(stub, id, balances)
 
     @staticmethod
-    def append(stub, id, value):
-        print("TestApi.append")
-        value = "y"
-        request = AppendRequest(id = id, append = value)
-        response = stub.AppendCall(request)
-        assert isinstance(response, State)
-        assert response.id == id
-        assert value in response.values
+    def _get(stub: BankAccountServiceStub, id, balances):
+        logger.info(f"checking balance {id}")
+        response = stub.Get(GetAccountRequest(account_id=id))
+        balance = response.account.account_balance
+        assert balance == balances.get(id,0)
 
     @staticmethod
-    def get(stub, id):
-        print("TestApi.get")
-        request = GetRequest(id = id)
-        response = stub.GetCall(request)
-        assert isinstance(response, State)
-        assert response.id == id
+    def _open(stub: BankAccountServiceStub):
+        account_owner = "random owner"
+        cmd = OpenAccountRequest(account_owner=account_owner, balance=200)
+        response = stub.OpenAccount(cmd)
+        assert isinstance(response, ApiResponse)
+        account_id = response.account.account_id
+        logger.info(f"created account {account_id}")
+        return account_id
 
     @staticmethod
-    def handler_failure_id(stub):
-        print("TestApi.handler_failure_id")
-        request = AppendRequest(id = "", append="value") # will throw
+    def _debit(stub: BankAccountServiceStub, id, balances):
+        logger.info(f"debit account {id}")
+        prior_balance = balances[id]
+        request = DebitAccountRequest(account_id=id, amount=1)
+        response = stub.DebitAccount(request)
+        assert isinstance(response, ApiResponse)
+        assert response.account.account_id==id
+        assert response.account.account_balance == prior_balance - 1
+        balances[id] = response.account.account_balance
+
+    @staticmethod
+    def _credit(stub: BankAccountServiceStub, id, balances):
+        logger.info(f"credit account {id}")
+        prior_balance = balances[id]
+        request = CreditAccountRequest(account_id=id, amount=1)
+        response = stub.CreditAccount(request)
+        assert isinstance(response, ApiResponse)
+        assert response.account.account_id==id
+        assert response.account.account_balance == prior_balance + 1
+        balances[id] = response.account.account_balance
+
+    @staticmethod
+    def _missing_account(stub: BankAccountServiceStub):
+        logger.info("test missing account")
+
+        request = CreditAccountRequest(account_id=str(uuid4()))
         did_fail = False
 
         try:
-            stub.AppendCall(request)
-        except Exception as e:
+            stub.CreditAccount(request)
+
+        except RpcError as e:
             did_fail = True
-            assert "empty entity id" in e.details().lower(), f"wrong error, {e.details()}"
+            assert "account not found" in e.details().lower(), f"wrong error, {e.details()}"
 
         assert did_fail, "did not fail"
 
-    def get_failure(stub):
-        print("TestApi.get_failure")
-        request = GetRequest(id = "not-an-id")
-        did_fail = True
+    @staticmethod
+    def _validation_fail(stub: BankAccountServiceStub):
+        logger.info("test validation failure")
+        did_fail = False
+        request = DebitAccountRequest(account_id=str(uuid4()), amount=-1) # will throw
         try:
-            response = stub.GetCall(request)
-            did_fail = False
+            stub.DebitAccount(request)
         except grpc.RpcError as e:
-            assert "not_found" in e.details().lower(), f"wrong error, {e.details()}"
-        except Exception as e:
-            raise Exception(f'wrong error, {e.details()}')
-
-        assert did_fail, "did not fail"
-
-    @staticmethod
-    def handler_validation_failure(stub):
-        print("TestApi.handler_failure")
-        did_fail = False
-        request = AppendRequest(id = "x") # will throw
-        try:
-            stub.AppendCall(request)
-        except Exception as e:
             did_fail = True
-            assert "cannot append empty value" in e.details().lower(), f'wrong error {e.details()}'
+            assert "amount must be greater than 0" in e.details().lower(), f'wrong error {e.details()}'
         assert did_fail, 'did not fail'
 
     @staticmethod
-    def test_noop(stub):
-        print("TestApi.test_noop")
-        request = AppendRequest(id = uuid4().hex, append = "no-op")
+    def _not_found(stub):
+        logger.info("test not found")
+        did_fail = False
+        request = GetAccountRequest(account_id=str(uuid4()))
+
         try:
-            response = stub.AppendCall(request)
-            print(type(response))
+            response = stub.Get(request)
+            logger.info(type(response))
         except RpcError as e:
             assert e.code() == StatusCode.NOT_FOUND, "wrong status code"
-        except Exception as e:
-            raise e
+            did_fail=True
+
+        assert did_fail, 'did not fail'
+
+    @staticmethod
+    def _no_op(stub):
+
+        logger.info("test no-op")
+        # create account
+        account_owner = "random owner"
+        cmd = OpenAccountRequest(account_owner=account_owner, balance=200)
+        response = stub.OpenAccount(cmd)
+        assert isinstance(response, ApiResponse)
+        account_id = response.account.account_id
+        balance = response.account.account_balance
+
+        # apply $0 credit, which internally is a no-op command
+        credit_response = stub.CreditAccount(CreditAccountRequest(
+            account_id=account_id,
+            amount=0
+        ))
+
+        assert credit_response.account.account_balance == balance
