@@ -1,6 +1,6 @@
-from test.test_api import TestApi
-from test.test_handler import TestHandler
-from test.test_cos import TestCos
+from test_client.test_api import TestApi
+from test_client.test_handler import TestHandler
+from test_client.test_cos import TestCos
 import os
 
 if __name__ == '__main__':
