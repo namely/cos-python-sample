@@ -53,7 +53,7 @@ services:
       COS_PORT: "9000"
 
   chiefofstate:
-    image: registry.namely.land/namely/chief-of-state:0.2-beta.2
+    image: registry.namely.land/namely/chief-of-state:0.3-alpha.1
     container_name: chiefofstate
     hostname: chiefofstate
     depends_on:
