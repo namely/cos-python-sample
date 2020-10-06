@@ -57,6 +57,7 @@ def get_tracer(service_name):
                 'reporting_host': os.environ.get("TRACE_HOST") or 'tracer',
                 'reporting_port': os.environ.get("TRACE_PORT") or '5775',
             },
+            'propagation': 'b3',
             'logging': True,
             'reporter_batch_size': 1,
         },
