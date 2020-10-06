@@ -29,8 +29,6 @@ services:
       APP_PORT: "50052"
       TRACE_HOST: tracer
       TRACE_PORT: 5775
-    volumes:
-        - ./code:/app/
 
   read-handler:
     image: namely/cos-python-sample:dev
