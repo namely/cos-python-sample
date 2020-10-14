@@ -99,7 +99,7 @@ services:
       COS_READ_SIDE_OFFSET_DB_SCHEMA: "public"
       COS_READ_SIDE_CONFIG__HOST__LOGGER_READSIDE: read-handler
       COS_READ_SIDE_CONFIG__PORT__LOGGER_READSIDE: 50053
-      JAVA_OPTS: "-Dconfig.resource=docker.conf"
+      JAVA_OPTS: "-Dconfig.resource=docker.conf -XX:+UseG1GC"
       COS_STORES_AUTO_CREATE: "true"
 
   postgres:
