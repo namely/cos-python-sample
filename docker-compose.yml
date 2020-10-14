@@ -79,8 +79,9 @@ services:
       WRITE_SIDE_HANDLER_SERVICE_HOST: write-handler
       WRITE_SIDE_HANDLER_SERVICE_PORT: 50052
       HANDLER_SERVICE_ENABLE_PROTO_VALIDATION: "false"
-      TRACE_HOST: tracer
-      TRACE_PORT: 14268
+      JAEGER_ENABLED: "true"
+      JAEGER_HOST: tracer
+      JAEGER_PORT: 14268
       COS_POSTGRES_USER: "postgres"
       COS_POSTGRES_PASSWORD: "changeme"
       COS_POSTGRES_HOST: "postgres"
