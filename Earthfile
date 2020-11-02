@@ -2,6 +2,7 @@ FROM python:3.7-slim-stretch
 
 all:
     BUILD +build-package
+    BUILD ./audit-poc+build-app
 
 build-base:
     USER root
