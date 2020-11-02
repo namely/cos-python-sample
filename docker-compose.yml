@@ -16,6 +16,21 @@ services:
       TRACE_HOST: tracer
       TRACE_PORT: 5775
 
+  audit-readside:
+    image: registry.namely.land/namely/audit:dev
+    container_name: audit-readside
+    ports:
+      - 50051
+    volumes:
+       - security:/etc/kafka/secrets
+    environment:
+      PRODUCER_SSL_CERT_FILE: "/etc/kafka/secrets/snakeoil-ca-1.crt"
+      PRODUCER_BROKERS: "kafka:29093"
+      PRODUCER_SECURITY_PROTOCOL: SASL_SSL
+      PRODUCER_API_KEY: client
+      PRODUCER_API_SECRET: client-secret
+      AUDIT_TOPIC_NAME: namely.audit
+
   write-handler:
     image: namely/cos-python-sample:dev
     container_name: write-handler
@@ -99,6 +114,8 @@ services:
       COS_READ_SIDE_OFFSET_DB_SCHEMA: "public"
       COS_READ_SIDE_CONFIG__HOST__LOGGER_READSIDE: read-handler
       COS_READ_SIDE_CONFIG__PORT__LOGGER_READSIDE: 50053
+      COS_READ_SIDE_CONFIG__HOST__AUDIT_READSIDE: audit-readside
+      COS_READ_SIDE_CONFIG__PORT__AUDIT_READSIDE: 50051
       JAVA_OPTS: "-Dconfig.resource=docker.conf -XX:+UseG1GC"
       COS_STORES_AUTO_CREATE: "true"
       COS_WRITE_PERSISTED_HEADERS: "x-custom-request-uuid"
@@ -134,6 +151,29 @@ services:
     ports:
       - 16686:16686
 
+  kafka:
+    image: registry.namely.land/namely/kafka-all-in-one:5.5.0
+    container_name: kafka
+    hostname: kafka
+    environment:
+      NAMELY_KAFKA_NUM_BROKERS: 2
+      KAFKA_PORT: 29093
+      HOSTNAME: kafka
+      KAFKA_NUM_PARTITIONS: 2
+      NUM_PARTITIONS: 2
+      CONFLUENT_NUM_PARTITIONS: 2
+    ports:
+      - "8082:8082"
+      - "32181:32181"
+      - "29093:29093"
+      - "29094:29094"
+      - "39093:39093"
+      - "39094:39094"
+    volumes:
+      - security:/kafka-all-secrets/
+
+volumes:
+  security:
   # grafana:
   #   image: grafana/grafana
   #   volumes:
