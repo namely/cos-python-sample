@@ -72,7 +72,7 @@ services:
       - 9095
       - 5266
     environment:
-      LOG_LEVEL: INFO
+      LOG_LEVEL: WARNING
       COS_ADDRESS: "0.0.0.0"
       COS_PORT: 9000
       COS_SERVICE_NAME: "chiefofstate"
@@ -102,6 +102,11 @@ services:
       JAVA_OPTS: "-Dconfig.resource=docker.conf -XX:+UseG1GC"
       COS_WRITE_PERSISTED_HEADERS: "x-custom-request-uuid"
       COS_STORES_AUTO_CREATE: "true"
+      JAEGER_SERVICE_NAME: "chiefofstate"
+      JAEGER_AGENT_HOST: "tracer"
+      JAEGER_AGENT_PORT: 14268
+      JAEGER_SAMPLER_TYPE: "const"
+      JAEGER_SAMPLER_PARAM: "1"
 
   postgres:
     image: postgres:9.6
