@@ -72,16 +72,14 @@ services:
       - 9095
       - 5266
     environment:
-      LOG_LEVEL: WARNING
+      LOG_LEVEL: "INFO"
+      LOG_STYLE: "SIMPLE"
       COS_ADDRESS: "0.0.0.0"
       COS_PORT: 9000
       COS_SERVICE_NAME: "chiefofstate"
       WRITE_SIDE_HANDLER_SERVICE_HOST: write-handler
       WRITE_SIDE_HANDLER_SERVICE_PORT: 50052
       HANDLER_SERVICE_ENABLE_PROTO_VALIDATION: "false"
-      JAEGER_ENABLED: "true"
-      JAEGER_HOST: tracer
-      JAEGER_PORT: 14268
       COS_POSTGRES_USER: "postgres"
       COS_POSTGRES_PASSWORD: "changeme"
       COS_POSTGRES_HOST: "postgres"
@@ -102,11 +100,12 @@ services:
       JAVA_OPTS: "-Dconfig.resource=docker.conf -XX:+UseG1GC"
       COS_WRITE_PERSISTED_HEADERS: "x-custom-request-uuid"
       COS_STORES_AUTO_CREATE: "true"
+      COS_JAEGER_ENABLED: "true"
       JAEGER_SERVICE_NAME: "chiefofstate"
-      JAEGER_AGENT_HOST: "tracer"
-      JAEGER_AGENT_PORT: 14268
+      JAEGER_ENDPOINT: http://tracer:14268/api/traces
       JAEGER_SAMPLER_TYPE: "const"
       JAEGER_SAMPLER_PARAM: "1"
+      JAEGER_PROPAGATION: "b3"
 
   postgres:
     image: postgres:9.6
@@ -133,13 +132,15 @@ services:
       - ./configs/pgadmin-servers.json:/etc/pgadmin4/pgadmin-servers.json
 
   tracer:
-    image: jaegertracing/all-in-one:1.17
+    image: jaegertracing/all-in-one:1.20
     container_name: tracer
     environment:
       COLLECTOR_ZIPKIN_HTTP_PORT: 9411
       LOG_LEVEL: INFO
     ports:
-      - 16686:16686
+      - 16686:16686 # frontend
+      - 14268
+      - 5775
 
   # grafana:
   #   image: grafana/grafana

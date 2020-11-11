@@ -20,12 +20,13 @@ logger = logging.getLogger("chief-of-state")
 class TestCos():
     @staticmethod
     def run(host, port):
-        channel = get_channel(host, port)
+        channel = get_channel(host, port, True)
 
         stub = ChiefOfStateServiceStub(channel)
         # test state
         id = str(uuid4())
         TestCos._create(stub, id)
+
         TestCos._get(stub, id)
         TestCos._update(stub, id)
         TestCos._fail(stub, id)
