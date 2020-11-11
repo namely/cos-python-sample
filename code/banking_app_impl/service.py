@@ -87,6 +87,18 @@ class BankingServiceImpl(BankAccountServiceServicer):
 
         return ApiResponse(account=state)
 
+    @classmethod
+    def get_subject_crn(cls, context):
+        for key, value in context.invocation_metadata():
+            if key == 'x-namely-subject-crn':
+                return value
+
+    @classmethod
+    def get_company_uuid(cls, context):
+        for key, value in context.invocation_metadata():
+            if key == 'x-company-uuid':
+                return value
+
 
     @classmethod
     def _cos_process_command(cls, id, command, context):
@@ -95,7 +107,12 @@ class BankingServiceImpl(BankAccountServiceServicer):
         client = cls._get_cos_client()
         command_any = pack_any(command)
 
-        metadata = [('x-custom-request-uuid', str(uuid4()))]
+        subject_crn = cls.get_subject_crn(context)
+        company_uuid = cls.get_company_uuid(context)
+
+        metadata = [('x-custom-request-uuid', str(uuid4())),
+                    ('x-namely-subject-crn', subject_crn),
+                    ('x-company-uuid', company_uuid)]
         request = ProcessCommandRequest(entity_id=id, command=command_any)
 
         try:
