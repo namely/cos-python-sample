@@ -64,15 +64,13 @@ services:
     image: registry.namely.land/namely/chief-of-state:dev
     container_name: chiefofstate
     hostname: chiefofstate
-    depends_on:
-      - postgres
     ports:
       - 9000
       - 9102
       - 9095
       - 5266
     environment:
-      LOG_LEVEL: "INFO"
+      LOG_LEVEL: "DEBUG"
       LOG_STYLE: "SIMPLE"
       COS_ADDRESS: "0.0.0.0"
       COS_PORT: 9000
