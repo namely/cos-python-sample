@@ -99,6 +99,23 @@ class BankingServiceImpl(BankAccountServiceServicer):
             if key == 'x-company-uuid':
                 return value
 
+    @classmethod
+    def get_service_entity_crn(cls, context):
+        for key, value in context.invocation_metadata():
+            if key == 'x-service-entity-crn':
+                return value
+
+    @classmethod
+    def get_on_behalf_of_crn(cls, context):
+        for key, value in context.invocation_metadata():
+            if key == 'x-on-behalf-of-crn':
+                return value
+
+    @classmethod
+    def get_impersonator_crn(cls, context):
+        for key, value in context.invocation_metadata():
+            if key == 'x-impersonator-crn':
+                return value
 
     @classmethod
     def _cos_process_command(cls, id, command, context):
@@ -109,10 +126,17 @@ class BankingServiceImpl(BankAccountServiceServicer):
 
         subject_crn = cls.get_subject_crn(context)
         company_uuid = cls.get_company_uuid(context)
+        service_entity_crn = cls.get_service_entity_crn(context)
+        on_behalf_of_crn = cls.get_on_behalf_of_crn(context)
+        impersonator_crn = cls.get_impersonator_crn(context)
 
         metadata = [('x-custom-request-uuid', str(uuid4())),
                     ('x-namely-subject-crn', subject_crn),
-                    ('x-company-uuid', company_uuid)]
+                    ('x-company-uuid', company_uuid),
+                    ('x-service-entity-crn', service_entity_crn),
+                    ('x-on-behalf-of-crn', on_behalf_of_crn),
+                    ('x-impersonator-crn', impersonator_crn)]
+
         request = ProcessCommandRequest(entity_id=id, command=command_any)
 
         try:

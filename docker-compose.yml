@@ -76,7 +76,7 @@ services:
         - ./code/test_client:/app/test_client:delegated
 
   chiefofstate:
-    image: registry.namely.land/namely/chief-of-state:0.4
+    image: registry.namely.land/namely/chief-of-state:0.5.1
     container_name: chiefofstate
     hostname: chiefofstate
     depends_on:
@@ -118,7 +118,7 @@ services:
       COS_READ_SIDE_CONFIG__PORT__AUDIT_READSIDE: 50051
       JAVA_OPTS: "-Dconfig.resource=docker.conf -XX:+UseG1GC"
       COS_STORES_AUTO_CREATE: "true"
-      COS_WRITE_PERSISTED_HEADERS: "x-custom-request-uuid,x-namely-subject-crn,x-company-uuid"
+      COS_WRITE_PERSISTED_HEADERS: "x-custom-request-uuid,x-namely-subject-crn,x-company-uuid,x-service-entity-crn,x-on-behalf-of-crn,x-impersonator-crn"
 
   postgres:
     image: postgres:9.6
