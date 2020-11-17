@@ -118,7 +118,7 @@ services:
       COS_READ_SIDE_CONFIG__PORT__AUDIT_READSIDE: 50051
       JAVA_OPTS: "-Dconfig.resource=docker.conf -XX:+UseG1GC"
       COS_STORES_AUTO_CREATE: "true"
-      COS_WRITE_PERSISTED_HEADERS: "x-custom-request-uuid,x-namely-subject-crn,x-company-uuid,x-service-entity-crn,x-on-behalf-of-crn,x-impersonator-crn"
+      COS_WRITE_PERSISTED_HEADERS: "x-custom-request-uuid,x-namely-subject-crn,x-company-uuid,x-namely-process-crn,x-namely-on-behalf-of-crn,x-namely-impersonator-crn"
 
   postgres:
     image: postgres:9.6
