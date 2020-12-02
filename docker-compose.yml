@@ -61,7 +61,7 @@ services:
         - ./code/test_client:/app/test_client:delegated
 
   chiefofstate:
-    image: registry.namely.land/namely/chief-of-state:dev
+    image: registry.namely.land/namely/chief-of-state:0.6.2-beta.1
     container_name: chiefofstate
     hostname: chiefofstate
     ports:
@@ -69,8 +69,9 @@ services:
       - 9102
       - 9095
       - 5266
+      - 8888
     environment:
-      LOG_LEVEL: "DEBUG"
+      LOG_LEVEL: "INFO"
       LOG_STYLE: "SIMPLE"
       COS_ADDRESS: "0.0.0.0"
       COS_PORT: 9000
@@ -114,8 +115,6 @@ services:
       POSTGRES_DB: postgres
     ports:
       - 5432:5432
-    volumes:
-      - ./configs/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
 
   pgadmin:
     image: dpage/pgadmin4:4.24
@@ -140,18 +139,18 @@ services:
       - 14268
       - 5775
 
-  # grafana:
-  #   image: grafana/grafana
-  #   volumes:
-  #     - ./configs/grafana-prometheus.yml:/etc/grafana/provisioning/datasources/prometheus.yml
-  #   ports:
-  #     - "3000:3000"
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - ./configs/grafana-prometheus.yml:/etc/grafana/provisioning/datasources/prometheus.yml
+    ports:
+      - "3000:3000"
 
-  # prometheus:
-  #   image: prom/prometheus:v2.1.0
-  #   volumes:
-  #     - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml
-  #   command:
-  #     - "--config.file=/etc/prometheus/prometheus.yml"
-  #   ports:
-  #     - "9090:9090"
+  prometheus:
+    image: prom/prometheus:v2.1.0
+    volumes:
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - "9090:9090"

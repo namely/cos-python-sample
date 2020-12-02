@@ -25,10 +25,6 @@ class TestCos():
         stub = ChiefOfStateServiceStub(channel)
         # test state
         id = str(uuid4())
-        TestCos._create(stub, id)
-
-        TestCos._get(stub, id)
-        TestCos._update(stub, id)
         TestCos._fail(stub, id)
         # test general
         TestCos._persist_header(stub)
