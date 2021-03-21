@@ -19,6 +19,8 @@ class TestApi():
         channel = get_channel(host, port, True)
         stub = BankAccountServiceStub(channel)
 
+        TestApi._consistent_account(stub)
+
         TestApi._missing_account(stub)
         TestApi._validation_fail(stub)
         TestApi._not_found(stub)
@@ -79,6 +81,39 @@ class TestApi():
         assert response.account.account_id==id
         assert response.account.account_balance == prior_balance + 1
         balances[id] = response.account.account_balance
+
+    @staticmethod
+    def _consistent_account(stub: BankAccountServiceStub):
+
+        id = ''
+
+        fp = '/app/.local/account-id.txt'
+
+        import os
+        if os.path.exists(fp):
+            logger.info("found file")
+            with open(fp, 'r') as f:
+                id = f.read().strip()
+
+        if not id:
+            id = TestApi._open(stub)
+            with open(fp, 'w') as f:
+                f.write(id)
+
+        logger.info(f"consistent account {id}")
+
+        try:
+            response = stub.Get(GetAccountRequest(account_id=id))
+            logger.info(f"found account {id}")
+            request = DebitAccountRequest(account_id=id, amount=1)
+            response = stub.DebitAccount(request)
+            assert isinstance(response, ApiResponse)
+            assert response.account.account_id==id
+            logger.info(f"debitted account {id}, balance {response.account.account_balance}")
+        except RpcError as e:
+            assert e.code() == StatusCode.NOT_FOUND, "wrong status code"
+            logger.info(f"not found, {id}")
+
 
     @staticmethod
     def _missing_account(stub: BankAccountServiceStub):

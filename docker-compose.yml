@@ -59,9 +59,11 @@ services:
       COS_PORT: "9000"
     volumes:
         - ./code/test_client:/app/test_client:delegated
+        - ./.local/:/app/.local/
 
   chiefofstate:
-    image: namely/chief-of-state:0.7.0
+    # image: namely/chief-of-state:0.7.0
+    image: namely/chief-of-state:dev
     container_name: chiefofstate
     hostname: chiefofstate
     ports:
@@ -90,6 +92,8 @@ services:
       COS_READ_SIDE_ENABLED: "true"
       COS_READ_SIDE_CONFIG__HOST__LOGGER_READSIDE: read-handler
       COS_READ_SIDE_CONFIG__PORT__LOGGER_READSIDE: 50053
+      COS_READ_SIDE_CONFIG__HOST__LOGGER_READSIDE_2: read-handler
+      COS_READ_SIDE_CONFIG__PORT__LOGGER_READSIDE_2: 50053
       COS_WRITE_PERSISTED_HEADERS: "x-custom-request-uuid"
       COS_JAEGER_ENABLED: "true"
       JAEGER_SERVICE_NAME: "chiefofstate"
@@ -97,6 +101,7 @@ services:
       JAEGER_SAMPLER_TYPE: "const"
       JAEGER_SAMPLER_PARAM: "1"
       JAEGER_PROPAGATION: "b3"
+      COS_MIGRATIONS_INITIAL_VERSION: "1"
 
   postgres:
     image: postgres:9.6
