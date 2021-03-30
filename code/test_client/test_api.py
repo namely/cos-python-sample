@@ -84,35 +84,28 @@ class TestApi():
 
     @staticmethod
     def _consistent_account(stub: BankAccountServiceStub):
-
-        id = ''
-
-        fp = '/app/.local/account-id.txt'
-
-        import os
-        if os.path.exists(fp):
-            logger.info("found file")
-            with open(fp, 'r') as f:
-                id = f.read().strip()
-
-        if not id:
-            id = TestApi._open(stub)
-            with open(fp, 'w') as f:
-                f.write(id)
-
-        logger.info(f"consistent account {id}")
+        logger.info("test consistent account")
+        id = '6ff6f770-7ab4-4161-b7f2-7aff57357065'
 
         try:
-            response = stub.Get(GetAccountRequest(account_id=id))
-            logger.info(f"found account {id}")
-            request = DebitAccountRequest(account_id=id, amount=1)
-            response = stub.DebitAccount(request)
-            assert isinstance(response, ApiResponse)
-            assert response.account.account_id==id
-            logger.info(f"debitted account {id}, balance {response.account.account_balance}")
+            # lazily create the account, ignore if already exists
+            cmd = OpenAccountRequest(
+                account_owner="consistent owner",
+                balance=200,
+                account_id=id
+            )
+            stub.OpenAccount(cmd)
+            logger.info(f"created consistent account {id}")
         except RpcError as e:
-            assert e.code() == StatusCode.NOT_FOUND, "wrong status code"
-            logger.info(f"not found, {id}")
+            assert e.code() == StatusCode.ALREADY_EXISTS, f"wrong status code {e.code()}"
+            logger.info(f"found consistent account {id}")
+
+        request = DebitAccountRequest(account_id=id, amount=1)
+        response = stub.DebitAccount(request)
+        assert isinstance(response, ApiResponse)
+        assert response.account.account_id==id
+        logger.info(f"debitted consistent account {id}, balance {response.account.account_balance}")
+
 
 
     @staticmethod
