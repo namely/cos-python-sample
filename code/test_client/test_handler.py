@@ -28,10 +28,10 @@ class TestHandler():
 
         stub = WriteSideHandlerServiceStub(channel)
 
-        # Commands._open(stub)
-        # Commands._debit(stub)
-        # Commands._credit(stub)
-        # Commands._bad_request(stub)
+        Commands._open(stub)
+        Commands._debit(stub)
+        Commands._credit(stub)
+        Commands._bad_request(stub)
         Commands._missing_owner_rich_error(stub)
 
 class Commands():
@@ -140,7 +140,7 @@ class Commands():
 
     @staticmethod
     def _missing_owner_rich_error(stub):
-        logger.info("missing account, rich error")
+        logger.info("missing account owner, rich error")
 
         # open account request missing the owner
         cmd = OpenAccountRequest(balance=200)

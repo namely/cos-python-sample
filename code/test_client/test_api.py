@@ -112,7 +112,7 @@ class TestApi():
 
     @staticmethod
     def _missing_owner_rich_error(stub: BankAccountServiceStub):
-        logger.info("missing account, rich error")
+        logger.info("missing account owner, rich error")
         # open account request missing the owner
         cmd = OpenAccountRequest(balance=200)
         did_fail = False
