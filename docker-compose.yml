@@ -98,7 +98,7 @@ services:
       COS_OTLP_COLLECTOR_ENDPOINT: http://otlp:4317
 
   otlp:
-    image: otel/opentelemetry-collector
+    image: otel/opentelemetry-collector-contrib:0.21.0
     volumes:
       - ./configs/otel-config.yaml:/etc/otel/config.yaml
 
