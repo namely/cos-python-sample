@@ -95,7 +95,7 @@ services:
       COS_READ_SIDE_CONFIG__HOST__READSIDE_1: read-handler
       COS_READ_SIDE_CONFIG__PORT__READSIDE_1: 50053
       COS_TRACE_PROPAGATOR: b3multi,ottracer
-      COS_OTLP_COLLECTOR_ENDPOINT: http://otlp:4317
+      COS_TELEMETRY_COLLECTOR_ENDPOINT: http://otlp:4317
 
   otlp:
     image: otel/opentelemetry-collector-contrib:0.21.0
